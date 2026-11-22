@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="NovaTech Store: notebooks, smartphones, audio y redes con asesoría especializada. Catálogo conectado a PostgreSQL."
+      content="CraftPedia: enciclopedia fan de Minecraft con ítems, guías, filtros por rareza y versión. Proyecto conectado a PostgreSQL."
     />
-    <title>NovaTech Store | Tecnología que impulsa tus ideas</title>
+    <title>CraftPedia | Enciclopedia fan de Minecraft</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" href="/vendor/bootstrap-icons/bootstrap-icons.min.css" />
@@ -16,14 +16,14 @@
   <body>
     <a class="skip-link" href="#contenido">Saltar al contenido principal</a>
 
-    <nav class="navbar navbar-expand-lg navbar-nt sticky-top" aria-label="Navegación principal">
+    <nav class="navbar navbar-expand-lg navbar-cp sticky-top" aria-label="Navegación principal">
       <div class="container">
-        <a class="navbar-brand d-flex align-items-center gap-2" href="/">
-          <span class="brand-mark"><i class="bi bi-cpu" aria-hidden="true"></i></span>
-          <span>NovaTech <span class="text-info">Store</span></span>
+        <a class="navbar-brand" href="/">
+          <span class="brand-block" aria-hidden="true"></span>
+          <span>Craft<span class="text-success">Pedia</span></span>
         </a>
         <button
-          class="navbar-toggler border-0"
+          class="navbar-toggler"
           type="button"
           data-bs-toggle="collapse"
           data-bs-target="#menuPrincipal"
@@ -36,11 +36,12 @@
         <div class="collapse navbar-collapse" id="menuPrincipal">
           <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center gap-lg-1">
             <li class="nav-item"><a class="nav-link active" aria-current="page" href="/">Inicio</a></li>
-            <li class="nav-item"><a class="nav-link" href="/productos.html">Productos</a></li>
+            <li class="nav-item"><a class="nav-link" href="/items.html">Ítems</a></li>
+            <li class="nav-item"><a class="nav-link" href="/guias.html">Guías</a></li>
             <li class="nav-item"><a class="nav-link" href="/nosotros.html">Nosotros</a></li>
             <li class="nav-item"><a class="nav-link" href="/contacto.html">Contacto</a></li>
             <li class="nav-item ms-lg-2">
-              <a class="btn btn-nt btn-sm px-3" href="/productos.html">Ver catálogo</a>
+              <a class="btn btn-cp btn-sm px-3" href="/items.html">Explorar ítems</a>
             </li>
           </ul>
         </div>
@@ -48,63 +49,77 @@
     </nav>
 
     <main id="contenido">
-      <section class="hero">
+      <section class="hero-cp">
+        <div class="hero-blocks" aria-hidden="true">
+          <span class="pixel-block block-grass"></span>
+          <span class="pixel-block block-diamond"></span>
+          <span class="pixel-block block-gold"></span>
+          <span class="pixel-block block-stone"></span>
+          <span class="pixel-block block-redstone"></span>
+        </div>
         <div class="container">
           <div class="row align-items-center g-5">
             <div class="col-lg-7">
-              <span class="badge-soft mb-3">
-                <i class="bi bi-geo-alt" aria-hidden="true"></i>
-                Tecnología para Chile · Despacho a todo el país
+              <span class="badge-pixel mb-3">
+                <i class="bi bi-box-seam" aria-hidden="true"></i>
+                Enciclopedia de ítems y guías
               </span>
               <h1 class="text-balance mb-3">
-                Tecnología que <span class="text-info">impulsa</span> tus ideas.
+                Todo Minecraft,<br />bloque por bloque.
               </h1>
               <p class="lead mb-4">
-                Notebooks, smartphones, audio y redes seleccionados para estudiar, trabajar y crear.
-                Asesoría real, stock actualizado y garantía en cada compra.
+                Explora ítems, conoce su rareza y descubre cómo conseguirlos. Aprende con guías
+                paso a paso para sobrevivir, minar y automatizar tu mundo.
               </p>
               <div class="d-flex flex-column flex-sm-row gap-3">
-                <a class="btn btn-nt btn-lg px-4" href="/productos.html">
-                  <i class="bi bi-grid me-2" aria-hidden="true"></i>Explorar catálogo
+                <a class="btn btn-cp btn-lg px-4" href="/items.html">
+                  <i class="bi bi-grid-3x3-gap me-2" aria-hidden="true"></i>Ver ítems
                 </a>
-                <a class="btn btn-nt-outline btn-lg px-4" href="/contacto.html">Hablar con un asesor</a>
+                <a class="btn btn-cp-gold btn-lg px-4" href="/guias.html">Leer guías</a>
               </div>
               <div class="d-flex flex-wrap gap-4 mt-4 small text-white-50">
-                <span><i class="bi bi-check2-circle text-info me-1" aria-hidden="true"></i>Garantía 12 meses</span>
-                <span><i class="bi bi-truck text-info me-1" aria-hidden="true"></i>Despacho seguro</span>
-                <span><i class="bi bi-headset text-info me-1" aria-hidden="true"></i>Soporte local</span>
+                <span><i class="bi bi-gem text-info me-1" aria-hidden="true"></i>Rarezas y versiones</span>
+                <span><i class="bi bi-funnel text-info me-1" aria-hidden="true"></i>Filtros en vivo</span>
+                <span><i class="bi bi-database text-info me-1" aria-hidden="true"></i>Datos en PostgreSQL</span>
               </div>
             </div>
             <div class="col-lg-5">
               <div class="hero-panel">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                  <span class="small text-white-50">Catálogo en línea</span>
-                  <span class="badge text-bg-success">Actualizado</span>
+                  <span class="small text-white-50">Hotbar del explorador</span>
+                  <span class="badge text-bg-success">En línea</span>
+                </div>
+                <div class="hotbar" aria-hidden="true">
+                  <span class="hotbar-slot active">⛏</span>
+                  <span class="hotbar-slot">🗡</span>
+                  <span class="hotbar-slot">🛡</span>
+                  <span class="hotbar-slot">🍎</span>
+                  <span class="hotbar-slot">🧱</span>
                 </div>
                 <div class="panel-row">
-                  <span class="panel-icon"><i class="bi bi-laptop" aria-hidden="true"></i></span>
+                  <span class="panel-icon" aria-hidden="true">💎</span>
                   <div>
-                    <strong class="d-block">Notebooks</strong>
-                    <span class="small text-white-50">Potencia para estudiar y programar</span>
+                    <strong class="d-block">Diamantes y netherita</strong>
+                    <span class="small text-white-50">El equipo que todo jugador busca</span>
                   </div>
                 </div>
                 <div class="panel-row">
-                  <span class="panel-icon"><i class="bi bi-phone" aria-hidden="true"></i></span>
+                  <span class="panel-icon" aria-hidden="true">🔴</span>
                   <div>
-                    <strong class="d-block">Smartphones y tablets</strong>
-                    <span class="small text-white-50">Movilidad para tu día a día</span>
+                    <strong class="d-block">Redstone y granjas</strong>
+                    <span class="small text-white-50">Automatiza tu mundo</span>
                   </div>
                 </div>
                 <div class="panel-row">
-                  <span class="panel-icon"><i class="bi bi-router" aria-hidden="true"></i></span>
+                  <span class="panel-icon" aria-hidden="true">🐉</span>
                   <div>
-                    <strong class="d-block">Redes y seguridad</strong>
-                    <span class="small text-white-50">Conectividad confiable en casa</span>
+                    <strong class="d-block">Guía del End</strong>
+                    <span class="small text-white-50">Derrota al dragón paso a paso</span>
                   </div>
                 </div>
                 <div class="d-flex justify-content-between align-items-center mt-3">
                   <span class="small text-white-50">Datos servidos desde PostgreSQL</span>
-                  <i class="bi bi-database text-info" aria-hidden="true"></i>
+                  <i class="bi bi-database-check text-info" aria-hidden="true"></i>
                 </div>
               </div>
             </div>
@@ -112,35 +127,35 @@
         </div>
       </section>
 
-      <section class="stats-band" aria-label="Indicadores del catálogo">
+      <section class="stats-band" aria-label="Indicadores de la enciclopedia">
         <div class="container">
           <div class="row g-3">
             <div class="col-6 col-lg-3">
               <div class="stat-card">
-                <div class="stat-icon"><i class="bi bi-box-seam" aria-hidden="true"></i></div>
-                <div class="stat-value" id="statProductos">—</div>
-                <div class="stat-label">Productos en catálogo</div>
+                <div class="stat-icon" aria-hidden="true">🧱</div>
+                <div class="stat-value" id="statItems">—</div>
+                <div class="stat-label">Ítems registrados</div>
               </div>
             </div>
             <div class="col-6 col-lg-3">
               <div class="stat-card">
-                <div class="stat-icon"><i class="bi bi-tags" aria-hidden="true"></i></div>
+                <div class="stat-icon" aria-hidden="true">📖</div>
+                <div class="stat-value" id="statGuias">—</div>
+                <div class="stat-label">Guías publicadas</div>
+              </div>
+            </div>
+            <div class="col-6 col-lg-3">
+              <div class="stat-card">
+                <div class="stat-icon" aria-hidden="true">🗂</div>
                 <div class="stat-value" id="statCategorias">—</div>
-                <div class="stat-label">Categorías disponibles</div>
+                <div class="stat-label">Categorías</div>
               </div>
             </div>
             <div class="col-6 col-lg-3">
               <div class="stat-card">
-                <div class="stat-icon"><i class="bi bi-boxes" aria-hidden="true"></i></div>
-                <div class="stat-value" id="statStock">—</div>
-                <div class="stat-label">Unidades en stock</div>
-              </div>
-            </div>
-            <div class="col-6 col-lg-3">
-              <div class="stat-card">
-                <div class="stat-icon"><i class="bi bi-cash-coin" aria-hidden="true"></i></div>
-                <div class="stat-value" id="statPrecio">—</div>
-                <div class="stat-label">Precio promedio</div>
+                <div class="stat-icon" aria-hidden="true">🏷</div>
+                <div class="stat-value" id="statVersiones">—</div>
+                <div class="stat-label">Versiones cubiertas</div>
               </div>
             </div>
           </div>
@@ -152,10 +167,10 @@
           <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-4">
             <div>
               <span class="eyebrow">Explora</span>
-              <h2 class="section-title h1 mb-0">Categorías destacadas</h2>
+              <h2 class="section-title h1 mb-0">Categorías de la enciclopedia</h2>
             </div>
-            <a class="btn btn-outline-primary d-none d-md-inline-flex" href="/productos.html">
-              Ver todo el catálogo <i class="bi bi-arrow-right ms-2" aria-hidden="true"></i>
+            <a class="btn btn-cp-outline d-none d-md-inline-flex" href="/items.html">
+              Ver todos los ítems <i class="bi bi-arrow-right ms-2" aria-hidden="true"></i>
             </a>
           </div>
           <div id="alertaCategorias" aria-live="polite"></div>
@@ -168,50 +183,69 @@
           <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-4">
             <div>
               <span class="eyebrow">Selección del equipo</span>
-              <h2 class="section-title h1 mb-0">Productos destacados</h2>
+              <h2 class="section-title h1 mb-0">Ítems destacados</h2>
             </div>
-            <p class="text-secondary mb-0">Stock real, precios claros y garantía incluida.</p>
+            <p class="text-muted-cp mb-0">Los objetos más buscados por la comunidad.</p>
           </div>
-          <div id="alertaDestacados" aria-live="polite"></div>
-          <div class="row g-4" id="productosDestacados" aria-live="polite"></div>
+          <div id="alertaItems" aria-live="polite"></div>
+          <div class="row g-4" id="itemsDestacados" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section class="section pt-0">
+        <div class="container">
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-4">
+            <div>
+              <span class="eyebrow">Aprende jugando</span>
+              <h2 class="section-title h1 mb-0">Guías destacadas</h2>
+            </div>
+            <a class="btn btn-cp-outline d-none d-md-inline-flex" href="/guias.html">
+              Ver todas las guías <i class="bi bi-arrow-right ms-2" aria-hidden="true"></i>
+            </a>
+          </div>
+          <div id="alertaGuias" aria-live="polite"></div>
+          <div class="row g-4" id="guiasDestacadas" aria-live="polite"></div>
         </div>
       </section>
 
       <section class="section pt-0">
         <div class="container">
           <div class="text-center mb-5">
-            <span class="eyebrow">Por qué elegirnos</span>
-            <h2 class="section-title h1 mb-2">Compra con acompañamiento real</h2>
-            <p class="text-secondary mx-auto" style="max-width: 42rem">
-              No vendemos cajas: te ayudamos a elegir el equipo correcto según tu presupuesto y lo que
-              necesitas hacer.
+            <span class="eyebrow">Hecha por jugadores</span>
+            <h2 class="section-title h1 mb-2">Una enciclopedia que crece contigo</h2>
+            <p class="text-muted-cp mx-auto" style="max-width: 44rem">
+              CraftPedia es un proyecto fan sin fines de lucro. Cada ítem y cada guía se guarda en
+              PostgreSQL y puedes aportar nuevos registros desde el sitio.
             </p>
           </div>
           <div class="row g-4">
             <div class="col-md-4">
               <div class="feature-card">
-                <div class="feature-icon"><i class="bi bi-chat-square-text" aria-hidden="true"></i></div>
-                <h3 class="h5">Asesoría especializada</h3>
+                <div class="feature-icon" aria-hidden="true">🔎</div>
+                <h3 class="h5">Filtros que sirven</h3>
                 <p class="text-secondary mb-0">
-                  Comparamos alternativas contigo y explicamos cada especificación en lenguaje simple.
+                  Busca por nombre, categoría, rareza, versión u orden. Los resultados se leen en
+                  tiempo real desde la base de datos.
                 </p>
               </div>
             </div>
             <div class="col-md-4">
               <div class="feature-card">
-                <div class="feature-icon"><i class="bi bi-shield-check" aria-hidden="true"></i></div>
-                <h3 class="h5">Compra protegida</h3>
+                <div class="feature-icon" aria-hidden="true">📝</div>
+                <h3 class="h5">Aporta tus ítems</h3>
                 <p class="text-secondary mb-0">
-                  Productos nuevos, boleta y garantía de 12 meses. Soporte postventa en Chile.
+                  ¿Falta un objeto? Agrégalo desde el formulario y aparecerá al instante en la
+                  enciclopedia.
                 </p>
               </div>
             </div>
             <div class="col-md-4">
               <div class="feature-card">
-                <div class="feature-icon"><i class="bi bi-truck" aria-hidden="true"></i></div>
-                <h3 class="h5">Despacho coordinado</h3>
+                <div class="feature-icon" aria-hidden="true">🧭</div>
+                <h3 class="h5">Guías paso a paso</h3>
                 <p class="text-secondary mb-0">
-                  Envíos a todo el país con seguimiento y opción de retiro en tienda.
+                  Desde tu primera noche hasta el dragón del End, con dificultad, versión y tiempo
+                  estimado.
                 </p>
               </div>
             </div>
@@ -224,13 +258,14 @@
           <div class="cta-band">
             <div class="row align-items-center g-4">
               <div class="col-lg-8">
-                <h2 class="h1 mb-2">¿No sabes qué equipo elegir?</h2>
+                <h2 class="h1 mb-2">¿Tienes una idea para la enciclopedia?</h2>
                 <p class="mb-0 text-white-50">
-                  Cuéntanos qué necesitas y te respondemos con una recomendación concreta, sin compromiso.
+                  Sugiere un ítem, corrige un dato o comparte tu guía. La comunidad construye
+                  CraftPedia.
                 </p>
               </div>
               <div class="col-lg-4 text-lg-end">
-                <a class="btn btn-nt btn-lg" href="/contacto.html">Solicitar asesoría</a>
+                <a class="btn btn-cp-gold btn-lg" href="/contacto.html">Enviar sugerencia</a>
               </div>
             </div>
           </div>
@@ -243,24 +278,25 @@
         <div class="row g-4">
           <div class="col-lg-4">
             <a class="navbar-brand d-inline-flex align-items-center gap-2 mb-3" href="/">
-              <span class="brand-mark"><i class="bi bi-cpu" aria-hidden="true"></i></span>
-              <span>NovaTech <span class="text-info">Store</span></span>
+              <span class="brand-block" aria-hidden="true"></span>
+              <span>Craft<span class="text-success">Pedia</span></span>
             </a>
             <p class="small">
-              Tienda tecnológica de Santiago. Notebooks, smartphones, audio y redes con asesoría
-              especializada y stock actualizado.
+              Enciclopedia fan de Minecraft creada para la evaluación INF211. Ítems, guías y datos
+              almacenados en PostgreSQL.
             </p>
             <div class="d-flex gap-2 mt-3">
               <a class="social-link" href="#" aria-label="Instagram"><i class="bi bi-instagram" aria-hidden="true"></i></a>
-              <a class="social-link" href="#" aria-label="Facebook"><i class="bi bi-facebook" aria-hidden="true"></i></a>
-              <a class="social-link" href="#" aria-label="LinkedIn"><i class="bi bi-linkedin" aria-hidden="true"></i></a>
+              <a class="social-link" href="#" aria-label="YouTube"><i class="bi bi-youtube" aria-hidden="true"></i></a>
+              <a class="social-link" href="#" aria-label="Discord"><i class="bi bi-discord" aria-hidden="true"></i></a>
             </div>
           </div>
           <div class="col-6 col-lg-2">
             <h5 class="h6 mb-3">Explorar</h5>
             <ul class="list-unstyled small d-grid gap-2 mb-0">
               <li><a href="/">Inicio</a></li>
-              <li><a href="/productos.html">Productos</a></li>
+              <li><a href="/items.html">Ítems</a></li>
+              <li><a href="/guias.html">Guías</a></li>
               <li><a href="/nosotros.html">Nosotros</a></li>
               <li><a href="/contacto.html">Contacto</a></li>
             </ul>
@@ -268,26 +304,28 @@
           <div class="col-6 col-lg-2">
             <h5 class="h6 mb-3">Categorías</h5>
             <ul class="list-unstyled small d-grid gap-2 mb-0">
-              <li><a href="/productos.html?categoria=1">Computación</a></li>
-              <li><a href="/productos.html?categoria=2">Móviles</a></li>
-              <li><a href="/productos.html?categoria=3">Audio</a></li>
-              <li><a href="/productos.html?categoria=4">Redes</a></li>
+              <li><a href="/items.html?categoria=1">Bloques</a></li>
+              <li><a href="/items.html?categoria=2">Herramientas</a></li>
+              <li><a href="/items.html?categoria=3">Armaduras</a></li>
+              <li><a href="/items.html?categoria=4">Comida</a></li>
+              <li><a href="/items.html?categoria=5">Redstone</a></li>
+              <li><a href="/items.html?categoria=6">Mobs</a></li>
             </ul>
           </div>
           <div class="col-lg-4">
-            <h5 class="h6 mb-3">Contacto</h5>
+            <h5 class="h6 mb-3">Estado del proyecto</h5>
             <ul class="list-unstyled small d-grid gap-2 mb-3">
-              <li><i class="bi bi-geo-alt me-2" aria-hidden="true"></i>Av. Providencia 1234, Santiago</li>
-              <li><i class="bi bi-telephone me-2" aria-hidden="true"></i>+56 2 2345 6789</li>
-              <li><i class="bi bi-envelope me-2" aria-hidden="true"></i>hola@novatech.cl</li>
+              <li><i class="bi bi-hdd-network me-2" aria-hidden="true"></i>Express + PostgreSQL</li>
+              <li><i class="bi bi-bootstrap me-2" aria-hidden="true"></i>Bootstrap 5 local</li>
+              <li><i class="bi bi-code-slash me-2" aria-hidden="true"></i>HTML semántico y JS modular</li>
             </ul>
-            <span class="small text-white-50 d-block mb-1">Estado del servicio</span>
+            <span class="small text-white-50 d-block mb-1">Conexión a la base de datos</span>
             <span class="badge text-bg-secondary" id="estadoApi">Verificando…</span>
           </div>
         </div>
         <div class="footer-bottom d-flex flex-column flex-md-row justify-content-between gap-2">
-          <span>© <span data-anio></span> NovaTech Store. Proyecto académico INF211.</span>
-          <span>HTML semántico · Bootstrap · Express · PostgreSQL</span>
+          <span>© <span data-anio></span> CraftPedia. Proyecto académico INF211.</span>
+          <span>Fan site no oficial · Minecraft es una marca de Mojang</span>
         </div>
       </div>
     </footer>

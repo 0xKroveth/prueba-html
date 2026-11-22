@@ -22,15 +22,15 @@ function bloquearFormulario(bloqueado) {
   textoEnviar.textContent = bloqueado ? "Enviando…" : "Enviar mensaje";
 }
 
-function aplicarProductoDesdeUrl() {
-  const producto = new URLSearchParams(window.location.search).get("producto");
+function aplicarItemDesdeUrl() {
+  const item = new URLSearchParams(window.location.search).get("item");
 
-  if (!producto) return;
+  if (!item) return;
 
-  asuntoContacto.value = `Consulta por ${producto}`.slice(0, 120);
+  asuntoContacto.value = `Sugerencia sobre ${item}`.slice(0, 120);
   mensajeContacto.value =
-    `Hola, me interesa el producto "${producto}". ` +
-    "¿Podrían confirmarme disponibilidad, precio y opciones de despacho?";
+    `Hola, quiero aportar información o corregir la ficha del ítem "${item}". ` +
+    "Detalles: ";
   actualizarContador();
 }
 
@@ -73,5 +73,5 @@ formContacto.addEventListener("submit", async (evento) => {
   }
 });
 
-aplicarProductoDesdeUrl();
+aplicarItemDesdeUrl();
 actualizarContador();

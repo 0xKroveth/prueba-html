@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Catálogo de ítems de Minecraft con filtros por categoría, rareza, versión y búsqueda. Datos leídos desde PostgreSQL."
+    />
+    <title>Ítems | CraftPedia</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/vendor/bootstrap-icons/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="/css/estilos.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#contenido">Saltar al contenido principal</a>
+
+    <nav class="navbar navbar-expand-lg navbar-cp sticky-top" aria-label="Navegación principal">
+      <div class="container">
+        <a class="navbar-brand" href="/">
+          <span class="brand-block" aria-hidden="true"></span>
+          <span>Craft<span class="text-success">Pedia</span></span>
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#menuPrincipal"
+          aria-controls="menuPrincipal"
+          aria-expanded="false"
+          aria-label="Abrir menú de navegación"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="menuPrincipal">
+          <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center gap-lg-1">
+            <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/items.html">Ítems</a>
+            </li>
+            <li class="nav-item"><a class="nav-link" href="/guias.html">Guías</a></li>
+            <li class="nav-item"><a class="nav-link" href="/nosotros.html">Nosotros</a></li>
+            <li class="nav-item"><a class="nav-link" href="/contacto.html">Contacto</a></li>
+            <li class="nav-item ms-lg-2">
+              <a class="btn btn-cp btn-sm px-3" href="/items.html">Explorar ítems</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <main id="contenido">
+      <header class="page-hero">
+        <div class="container">
+          <nav aria-label="Ubicación">
+            <ol class="breadcrumb small mb-3">
+              <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+              <li class="breadcrumb-item active" aria-current="page">Ítems</li>
+            </ol>
+          </nav>
+          <div class="row align-items-end g-3">
+            <div class="col-lg-8">
+              <h1 class="mb-2">Enciclopedia de ítems</h1>
+              <p class="lead mb-0 text-white-50">
+                Busca, filtra y descubre cada objeto de Minecraft: cómo se obtiene, su rareza, su
+                versión y cuántos caben en un stack.
+              </p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+              <button
+                type="button"
+                class="btn btn-cp-gold btn-lg"
+                data-bs-toggle="modal"
+                data-bs-target="#modalAgregarItem"
+              >
+                <i class="bi bi-plus-lg me-2" aria-hidden="true"></i>Agregar ítem
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <section class="section">
+        <div class="container">
+          <div class="row g-4">
+            <aside class="col-lg-3">
+              <div class="filtros-panel filtros-sticky">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h2 class="h6 mb-0">Filtrar ítems</h2>
+                  <button type="button" class="btn btn-sm btn-link text-decoration-none" id="btnLimpiar">
+                    Limpiar
+                  </button>
+                </div>
+
+                <form id="formFiltros" novalidate>
+                  <div class="mb-3">
+                    <label class="form-label" for="buscar">Buscar</label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-white border-end-0" aria-hidden="true">
+                        <i class="bi bi-search"></i>
+                      </span>
+                      <input
+                        type="search"
+                        class="form-control border-start-0"
+                        id="buscar"
+                        name="buscar"
+                        placeholder="Diamante, creeper…"
+                        maxlength="80"
+                        autocomplete="off"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label" for="categoria">Categoría</label>
+                    <select class="form-select" id="categoria" name="categoria"></select>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label" for="rareza">Rareza</label>
+                    <select class="form-select" id="rareza" name="rareza"></select>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label" for="version">Versión</label>
+                    <select class="form-select" id="version" name="version"></select>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label" for="orden">Ordenar por</label>
+                    <select class="form-select" id="orden" name="orden">
+                      <option value="nombre">Nombre (A–Z)</option>
+                      <option value="rareza">Rareza (mayor a menor)</option>
+                      <option value="stack_desc">Stack máximo</option>
+                      <option value="recientes">Más recientes</option>
+                    </select>
+                  </div>
+
+                  <button type="submit" class="btn btn-cp w-100">
+                    <i class="bi bi-funnel me-2" aria-hidden="true"></i>Aplicar filtros
+                  </button>
+                </form>
+
+                <hr class="my-4" />
+
+                <p class="small text-muted-cp mb-2" id="resumenFiltros" aria-live="polite">
+                  Mostrando toda la enciclopedia.
+                </p>
+                <p class="small mb-0">
+                  <strong id="contadorResultados">Cargando…</strong>
+                </p>
+              </div>
+            </aside>
+
+            <div class="col-lg-9">
+              <div id="alertaItems" aria-live="polite"></div>
+              <div class="row g-4" id="listaItems" aria-live="polite"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container">
+        <div class="row g-4">
+          <div class="col-lg-4">
+            <a class="navbar-brand d-inline-flex align-items-center gap-2 mb-3" href="/">
+              <span class="brand-block" aria-hidden="true"></span>
+              <span>Craft<span class="text-success">Pedia</span></span>
+            </a>
+            <p class="small">
+              Enciclopedia fan de Minecraft creada para la evaluación INF211. Ítems, guías y datos
+              almacenados en PostgreSQL.
+            </p>
+          </div>
+          <div class="col-6 col-lg-2">
+            <h5 class="h6 mb-3">Explorar</h5>
+            <ul class="list-unstyled small d-grid gap-2 mb-0">
+              <li><a href="/">Inicio</a></li>
+              <li><a href="/items.html">Ítems</a></li>
+              <li><a href="/guias.html">Guías</a></li>
+              <li><a href="/nosotros.html">Nosotros</a></li>
+              <li><a href="/contacto.html">Contacto</a></li>
+            </ul>
+          </div>
+          <div class="col-6 col-lg-2">
+            <h5 class="h6 mb-3">Categorías</h5>
+            <ul class="list-unstyled small d-grid gap-2 mb-0">
+              <li><a href="/items.html?categoria=1">Bloques</a></li>
+              <li><a href="/items.html?categoria=2">Herramientas</a></li>
+              <li><a href="/items.html?categoria=3">Armaduras</a></li>
+              <li><a href="/items.html?categoria=4">Comida</a></li>
+              <li><a href="/items.html?categoria=5">Redstone</a></li>
+              <li><a href="/items.html?categoria=6">Mobs</a></li>
+            </ul>
+          </div>
+          <div class="col-lg-4">
+            <h5 class="h6 mb-3">Estado del proyecto</h5>
+            <ul class="list-unstyled small d-grid gap-2 mb-3">
+              <li><i class="bi bi-hdd-network me-2" aria-hidden="true"></i>Express + PostgreSQL</li>
+              <li><i class="bi bi-bootstrap me-2" aria-hidden="true"></i>Bootstrap 5 local</li>
+              <li><i class="bi bi-code-slash me-2" aria-hidden="true"></i>HTML semántico y JS modular</li>
+            </ul>
+            <span class="small text-white-50 d-block mb-1">Conexión a la base de datos</span>
+            <span class="badge text-bg-secondary" id="estadoApi">Verificando…</span>
+          </div>
+        </div>
+        <div class="footer-bottom d-flex flex-column flex-md-row justify-content-between gap-2">
+          <span>© <span data-anio></span> CraftPedia. Proyecto académico INF211.</span>
+          <span>Fan site no oficial · Minecraft es una marca de Mojang</span>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Modal de detalle -->
+    <div class="modal fade" id="modalDetalleItem" tabindex="-1" aria-labelledby="detalleItemNombre" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 class="modal-title h5" id="detalleItemNombre">Detalle del ítem</h2>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row g-4">
+              <div class="col-md-5">
+                <div class="item-visual" id="detalleItemVisual">
+                  <span id="detalleItemIcono" aria-hidden="true">🧱</span>
+                  <span class="badge-destacado d-none" id="detalleItemDestacado">Destacado</span>
+                  <span class="badge-categoria" id="detalleItemCategoria">Categoría</span>
+                </div>
+              </div>
+              <div class="col-md-7">
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                  <span class="rareza" id="detalleItemRareza">Rareza</span>
+                  <span class="badge text-bg-light border" id="detalleItemVersion">v1.21</span>
+                  <span class="badge text-bg-light border" id="detalleItemStack">Stack máximo: 64</span>
+                </div>
+                <h3 class="h6">Descripción</h3>
+                <p class="text-secondary" id="detalleItemDescripcion"></p>
+                <h3 class="h6">Cómo obtenerlo</h3>
+                <p class="text-secondary mb-0" id="detalleItemObtencion"></p>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer justify-content-between">
+            <button type="button" class="btn btn-cp-outline" data-bs-dismiss="modal">Cerrar</button>
+            <a class="btn btn-cp" id="btnConsultarItem" href="/contacto.html">
+              <i class="bi bi-chat-dots me-2" aria-hidden="true"></i>Sugerir corrección
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para agregar ítem -->
+    <div class="modal fade" id="modalAgregarItem" tabindex="-1" aria-labelledby="tituloModalAgregar" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+          <form id="formItem" novalidate>
+            <div class="modal-header">
+              <div>
+                <h2 class="modal-title h5" id="tituloModalAgregar">Agregar un ítem</h2>
+                <p class="small text-muted-cp mb-0">Se guardará en PostgreSQL y aparecerá en el catálogo.</p>
+              </div>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+              <div id="alertaFormularioItem" aria-live="polite"></div>
+
+              <div class="row g-3">
+                <div class="col-md-8">
+                  <label class="form-label" for="nombreItem">Nombre *</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="nombreItem"
+                    name="nombre"
+                    minlength="2"
+                    maxlength="100"
+                    placeholder="Ej: Bloque de amatista"
+                    required
+                  />
+                  <div class="invalid-feedback">Escribe un nombre de entre 2 y 100 caracteres.</div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label" for="iconoItem">Icono (emoji) *</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="iconoItem"
+                    name="icono"
+                    value="🧱"
+                    maxlength="16"
+                    required
+                  />
+                  <div class="invalid-feedback">Indica un emoji o símbolo.</div>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label" for="categoriaItem">Categoría *</label>
+                  <select class="form-select" id="categoriaItem" name="categoria_id" required></select>
+                  <div class="invalid-feedback">Selecciona una categoría.</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="rarezaItem">Rareza *</label>
+                  <select class="form-select" id="rarezaItem" name="rareza" required></select>
+                  <div class="invalid-feedback">Selecciona una rareza.</div>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label" for="versionItem">Versión *</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="versionItem"
+                    name="version"
+                    list="listaVersiones"
+                    maxlength="20"
+                    placeholder="1.21"
+                    required
+                  />
+                  <datalist id="listaVersiones"></datalist>
+                  <div class="invalid-feedback">Indica la versión, por ejemplo 1.21.</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="stackItem">Stack máximo *</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="stackItem"
+                    name="stack_max"
+                    value="64"
+                    min="1"
+                    max="64"
+                    required
+                  />
+                  <div class="invalid-feedback">Debe ser un número entre 1 y 64.</div>
+                </div>
+
+                <div class="col-12">
+                  <label class="form-label" for="obtencionItem">Cómo se obtiene *</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="obtencionItem"
+                    name="obtencion"
+                    minlength="5"
+                    maxlength="300"
+                    placeholder="Ej: Minando amatista en una geoda."
+                    required
+                  />
+                  <div class="invalid-feedback">Describe cómo se obtiene (5 a 300 caracteres).</div>
+                </div>
+
+                <div class="col-12">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <label class="form-label mb-0" for="descripcionItem">Descripción *</label>
+                    <span class="small text-muted-cp"><span id="contadorDescripcionItem">0</span>/500</span>
+                  </div>
+                  <textarea
+                    class="form-control mt-1"
+                    id="descripcionItem"
+                    name="descripcion"
+                    rows="3"
+                    minlength="10"
+                    maxlength="500"
+                    placeholder="Para qué sirve, dónde se usa y por qué es útil…"
+                    required
+                  ></textarea>
+                  <div class="invalid-feedback">Escribe una descripción de 10 a 500 caracteres.</div>
+                </div>
+
+                <div class="col-12">
+                  <span class="form-label d-block">Iconos rápidos</span>
+                  <div class="d-flex flex-wrap gap-2">
+                    <button type="button" class="btn btn-sm btn-cp-outline" data-icono="💎">💎</button>
+                    <button type="button" class="btn btn-sm btn-cp-outline" data-icono="⛏">⛏</button>
+                    <button type="button" class="btn btn-sm btn-cp-outline" data-icono="🗡">🗡</button>
+                    <button type="button" class="btn btn-sm btn-cp-outline" data-icono="🛡">🛡</button>
+                    <button type="button" class="btn btn-sm btn-cp-outline" data-icono="🍎">🍎</button>
+                    <button type="button" class="btn btn-sm btn-cp-outline" data-icono="🔴">🔴</button>
+                    <button type="button" class="btn btn-sm btn-cp-outline" data-icono="🐷">🐷</button>
+                    <button type="button" class="btn btn-sm btn-cp-outline" data-icono="🧱">🧱</button>
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="destacadoItem" name="destacado" />
+                    <label class="form-check-label" for="destacadoItem">
+                      Marcar como ítem destacado en la página de inicio
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-cp-outline" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-cp" id="btnGuardarItem">
+                <span class="spinner-border spinner-border-sm me-2 d-none" id="spinnerGuardarItem" aria-hidden="true"></span>
+                <span id="textoGuardarItem">Guardar ítem</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+      <div class="toast" id="toastItem" role="status" aria-live="polite" aria-atomic="true">
+        <div class="toast-header">
+          <i class="bi bi-check-circle-fill text-success me-2" aria-hidden="true"></i>
+          <strong class="me-auto">CraftPedia</strong>
+          <small>ahora</small>
+          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+        </div>
+        <div class="toast-body" id="toastItemTexto"></div>
+      </div>
+    </div>
+
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="/js/comun.js"></script>
+    <script type="module" src="/js/items.js"></script>
+  </body>
+</html>

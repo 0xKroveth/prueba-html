@@ -1,8 +1,7 @@
 import { solicitar } from "./api.js";
 import {
-  crearTarjetaProducto,
-  estiloCategoria,
-  formatoCLP,
+  crearTarjetaGuia,
+  crearTarjetaItem,
   limpiarAlerta,
   mostrarAlerta,
   mostrarEsqueletos
@@ -11,19 +10,21 @@ import {
 const numero = new Intl.NumberFormat("es-CL");
 
 const contenedorCategorias = document.getElementById("contenedorCategorias");
-const contenedorDestacados = document.getElementById("productosDestacados");
+const contenedorItems = document.getElementById("itemsDestacados");
+const contenedorGuias = document.getElementById("guiasDestacadas");
 const alertaCategorias = document.getElementById("alertaCategorias");
-const alertaDestacados = document.getElementById("alertaDestacados");
+const alertaItems = document.getElementById("alertaItems");
+const alertaGuias = document.getElementById("alertaGuias");
 
 async function cargarEstadisticas() {
   try {
     const datos = await solicitar("/estadisticas");
-    document.getElementById("statProductos").textContent = numero.format(datos.total_productos);
+    document.getElementById("statItems").textContent = numero.format(datos.total_items);
+    document.getElementById("statGuias").textContent = numero.format(datos.total_guias);
     document.getElementById("statCategorias").textContent = numero.format(datos.total_categorias);
-    document.getElementById("statStock").textContent = numero.format(datos.unidades_en_stock);
-    document.getElementById("statPrecio").textContent = formatoCLP.format(datos.precio_promedio);
+    document.getElementById("statVersiones").textContent = numero.format(datos.total_versiones);
   } catch {
-    ["statProductos", "statCategorias", "statStock", "statPrecio"].forEach((id) => {
+    ["statItems", "statGuias", "statCategorias", "statVersiones"].forEach((id) => {
       document.getElementById(id).textContent = "—";
     });
   }
@@ -31,7 +32,7 @@ async function cargarEstadisticas() {
 
 async function cargarCategorias() {
   try {
-    const categorias = await solicitar("/categorias");
+    const { categorias } = await solicitar("/meta");
     contenedorCategorias.replaceChildren();
     limpiarAlerta(alertaCategorias);
 
@@ -39,32 +40,32 @@ async function cargarCategorias() {
 
     categorias.forEach((categoria) => {
       const columna = document.createElement("div");
-      columna.className = "col-sm-6 col-lg-3";
+      columna.className = "col-sm-6 col-lg-4 col-xl-2";
 
       const enlace = document.createElement("a");
       enlace.className = "categoria-card";
-      enlace.href = `/productos.html?categoria=${categoria.categoria_id}`;
+      enlace.href = `/items.html?categoria=${categoria.categoria_id}`;
 
-      const estilo = estiloCategoria(categoria.categoria_id);
       const icono = document.createElement("span");
       icono.className = "categoria-icon";
-      icono.innerHTML = `<i class="bi ${estilo.icono}" aria-hidden="true"></i>`;
+      icono.textContent = categoria.icono;
+      icono.setAttribute("aria-hidden", "true");
 
       const titulo = document.createElement("h3");
       titulo.className = "h6 mb-1";
       titulo.textContent = categoria.nombre;
 
-      const detalle = document.createElement("p");
-      detalle.className = "small text-secondary mb-2";
-      detalle.textContent = categoria.descripcion;
+      const descripcion = document.createElement("p");
+      descripcion.className = "small text-secondary mb-2";
+      descripcion.textContent = categoria.descripcion;
 
       const conteo = document.createElement("span");
-      conteo.className = "small fw-semibold text-primary";
-      conteo.textContent = `${categoria.total_productos} producto${
-        categoria.total_productos === 1 ? "" : "s"
+      conteo.className = "conteo";
+      conteo.textContent = `${categoria.total_items} ítem${
+        categoria.total_items === 1 ? "" : "s"
       }`;
 
-      enlace.append(icono, titulo, detalle, conteo);
+      enlace.append(icono, titulo, descripcion, conteo);
       columna.append(enlace);
       fragmento.append(columna);
     });
@@ -75,35 +76,45 @@ async function cargarCategorias() {
   }
 }
 
-async function cargarDestacados() {
-  mostrarEsqueletos(contenedorDestacados, 3);
+async function cargarItemsDestacados() {
+  mostrarEsqueletos(contenedorItems, 3, "330px");
 
   try {
-    const datos = await solicitar("/productos?destacados=true&orden=precio_desc");
-    contenedorDestacados.replaceChildren();
-    limpiarAlerta(alertaDestacados);
-
-    if (datos.productos.length === 0) {
-      const vacio = document.createElement("div");
-      vacio.className = "col-12";
-      vacio.innerHTML =
-        '<div class="empty-state"><i class="bi bi-box-seam fs-1 text-secondary" aria-hidden="true"></i>' +
-        '<p class="mt-3 mb-0">Aún no hay productos destacados en el catálogo.</p></div>';
-      contenedorDestacados.append(vacio);
-      return;
-    }
+    const datos = await solicitar("/items?destacados=true&orden=rareza");
+    contenedorItems.replaceChildren();
+    limpiarAlerta(alertaItems);
 
     const fragmento = document.createDocumentFragment();
-    datos.productos.slice(0, 3).forEach((producto) => {
-      fragmento.append(crearTarjetaProducto(producto));
+    datos.items.slice(0, 3).forEach((item) => {
+      fragmento.append(crearTarjetaItem(item));
     });
-    contenedorDestacados.append(fragmento);
+    contenedorItems.append(fragmento);
   } catch (error) {
-    contenedorDestacados.replaceChildren();
-    mostrarAlerta(alertaDestacados, "danger", error.message);
+    contenedorItems.replaceChildren();
+    mostrarAlerta(alertaItems, "danger", error.message);
+  }
+}
+
+async function cargarGuiasDestacadas() {
+  mostrarEsqueletos(contenedorGuias, 2, "240px", "col-lg-6");
+
+  try {
+    const datos = await solicitar("/guias?destacadas=true&orden=titulo");
+    contenedorGuias.replaceChildren();
+    limpiarAlerta(alertaGuias);
+
+    const fragmento = document.createDocumentFragment();
+    datos.guias.slice(0, 2).forEach((guia) => {
+      fragmento.append(crearTarjetaGuia(guia));
+    });
+    contenedorGuias.append(fragmento);
+  } catch (error) {
+    contenedorGuias.replaceChildren();
+    mostrarAlerta(alertaGuias, "danger", error.message);
   }
 }
 
 cargarEstadisticas();
 cargarCategorias();
-cargarDestacados();
+cargarItemsDestacados();
+cargarGuiasDestacadas();

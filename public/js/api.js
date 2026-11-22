@@ -10,7 +10,7 @@ export class ErrorApi extends Error {
 
 /**
  * Realiza una petición a la API y normaliza los errores.
- * @param {string} ruta Ruta relativa, por ejemplo "/productos".
+ * @param {string} ruta Ruta relativa, por ejemplo "/items".
  * @param {RequestInit} opciones Opciones de fetch.
  */
 export async function solicitar(ruta, opciones = {}) {

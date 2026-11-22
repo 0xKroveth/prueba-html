@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="Contacta a NovaTech Store: formulario conectado a PostgreSQL, dirección, teléfono, correo y horarios."
+      content="Contacta a CraftPedia para sugerir ítems, corregir datos o proponer guías de Minecraft. Formulario conectado a PostgreSQL."
     />
-    <title>Contacto | NovaTech Store</title>
+    <title>Contacto | CraftPedia</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" href="/vendor/bootstrap-icons/bootstrap-icons.min.css" />
@@ -16,14 +16,14 @@
   <body>
     <a class="skip-link" href="#contenido">Saltar al contenido principal</a>
 
-    <nav class="navbar navbar-expand-lg navbar-nt sticky-top" aria-label="Navegación principal">
+    <nav class="navbar navbar-expand-lg navbar-cp sticky-top" aria-label="Navegación principal">
       <div class="container">
-        <a class="navbar-brand d-flex align-items-center gap-2" href="/">
-          <span class="brand-mark"><i class="bi bi-cpu" aria-hidden="true"></i></span>
-          <span>NovaTech <span class="text-info">Store</span></span>
+        <a class="navbar-brand" href="/">
+          <span class="brand-block" aria-hidden="true"></span>
+          <span>Craft<span class="text-success">Pedia</span></span>
         </a>
         <button
-          class="navbar-toggler border-0"
+          class="navbar-toggler"
           type="button"
           data-bs-toggle="collapse"
           data-bs-target="#menuPrincipal"
@@ -36,13 +36,14 @@
         <div class="collapse navbar-collapse" id="menuPrincipal">
           <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center gap-lg-1">
             <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
-            <li class="nav-item"><a class="nav-link" href="/productos.html">Productos</a></li>
+            <li class="nav-item"><a class="nav-link" href="/items.html">Ítems</a></li>
+            <li class="nav-item"><a class="nav-link" href="/guias.html">Guías</a></li>
             <li class="nav-item"><a class="nav-link" href="/nosotros.html">Nosotros</a></li>
             <li class="nav-item">
               <a class="nav-link active" aria-current="page" href="/contacto.html">Contacto</a>
             </li>
             <li class="nav-item ms-lg-2">
-              <a class="btn btn-nt btn-sm px-3" href="/productos.html">Ver catálogo</a>
+              <a class="btn btn-cp btn-sm px-3" href="/items.html">Explorar ítems</a>
             </li>
           </ul>
         </div>
@@ -58,18 +59,11 @@
               <li class="breadcrumb-item active" aria-current="page">Contacto</li>
             </ol>
           </nav>
-          <div class="row align-items-end g-3">
-            <div class="col-lg-8">
-              <h1 class="display-6 mb-2">Hablemos de tu próximo equipo</h1>
-              <p class="mb-0 text-white-50">
-                Completa el formulario y guardaremos tu consulta en nuestra base de datos. También
-                puedes visitarnos o escribirnos directamente.
-              </p>
-            </div>
-            <div class="col-lg-4 text-lg-end">
-              <span class="badge-soft"><i class="bi bi-chat-dots" aria-hidden="true"></i> Respuesta en 24 h</span>
-            </div>
-          </div>
+          <h1 class="mb-2">Hablemos de Minecraft</h1>
+          <p class="lead mb-0 text-white-50">
+            ¿Falta un ítem, hay un dato incorrecto o tienes una guía que compartir? Escríbenos: el
+            mensaje se guarda en PostgreSQL.
+          </p>
         </div>
       </header>
 
@@ -77,157 +71,128 @@
         <div class="container">
           <div class="row g-4 g-lg-5">
             <div class="col-lg-5">
-              <span class="eyebrow">Información de contacto</span>
-              <h2 class="section-title h2 mb-3">Estamos en Providencia</h2>
-              <p class="text-secondary mb-4">
-                Atendemos de lunes a viernes y también los sábados por la mañana. Si prefieres, envía
-                el formulario y te contactamos.
+              <span class="eyebrow">Cómo ayudamos</span>
+              <h2 class="h1 mb-3">Aporta a la enciclopedia</h2>
+              <p class="text-muted-cp mb-4">
+                CraftPedia crece con los aportes de la comunidad. Cuéntanos qué mejorarías y lo
+                revisaremos para la próxima actualización.
               </p>
 
-              <div class="d-grid gap-3">
+              <div class="d-grid gap-3 mb-4">
                 <div class="contacto-info-card">
-                  <span class="icono"><i class="bi bi-geo-alt" aria-hidden="true"></i></span>
+                  <span class="icono" aria-hidden="true">💎</span>
                   <div>
-                    <h3 class="h6 mb-1">Dirección</h3>
-                    <p class="small text-secondary mb-0">Av. Providencia 1234, Santiago, Región Metropolitana.</p>
+                    <strong class="d-block">Nuevos ítems</strong>
+                    <span class="small text-muted-cp">
+                      Propón objetos, bloques o mobs que falten en el catálogo.
+                    </span>
                   </div>
                 </div>
                 <div class="contacto-info-card">
-                  <span class="icono"><i class="bi bi-telephone" aria-hidden="true"></i></span>
+                  <span class="icono" aria-hidden="true">🛠</span>
                   <div>
-                    <h3 class="h6 mb-1">Teléfono</h3>
-                    <p class="small text-secondary mb-0">
-                      <a href="tel:+56223456789">+56 2 2345 6789</a>
-                    </p>
+                    <strong class="d-block">Correcciones</strong>
+                    <span class="small text-muted-cp">
+                      Avisa si una rareza, versión o forma de obtención está mal.
+                    </span>
                   </div>
                 </div>
                 <div class="contacto-info-card">
-                  <span class="icono"><i class="bi bi-envelope" aria-hidden="true"></i></span>
+                  <span class="icono" aria-hidden="true">📖</span>
                   <div>
-                    <h3 class="h6 mb-1">Correo</h3>
-                    <p class="small text-secondary mb-0">
-                      <a href="mailto:hola@novatech.cl">hola@novatech.cl</a>
-                    </p>
-                  </div>
-                </div>
-                <div class="contacto-info-card">
-                  <span class="icono"><i class="bi bi-clock" aria-hidden="true"></i></span>
-                  <div>
-                    <h3 class="h6 mb-1">Horario</h3>
-                    <p class="small text-secondary mb-0">
-                      Lunes a viernes: 09:00 a 18:30<br />
-                      Sábado: 10:00 a 14:00
-                    </p>
+                    <strong class="d-block">Guías y trucos</strong>
+                    <span class="small text-muted-cp">
+                      Comparte estrategias de supervivencia, redstone o construcción.
+                    </span>
                   </div>
                 </div>
               </div>
 
-              <div class="mt-4">
-                <h3 class="h6 mb-2">Síguenos</h3>
-                <div class="d-flex gap-2">
-                  <a class="social-link bg-dark" href="#" aria-label="Instagram"><i class="bi bi-instagram" aria-hidden="true"></i></a>
-                  <a class="social-link bg-dark" href="#" aria-label="Facebook"><i class="bi bi-facebook" aria-hidden="true"></i></a>
-                  <a class="social-link bg-dark" href="#" aria-label="LinkedIn"><i class="bi bi-linkedin" aria-hidden="true"></i></a>
+              <div class="cp-card p-3">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <i class="bi bi-database-check" aria-hidden="true"></i>
+                  <strong class="small">Inserción real en PostgreSQL</strong>
                 </div>
+                <p class="small text-muted-cp mb-0">
+                  Cada mensaje enviado se valida en el servidor y se guarda en la tabla
+                  <code>mensajes_contacto</code>.
+                </p>
               </div>
             </div>
 
             <div class="col-lg-7">
               <div class="form-card">
-                <h2 class="h3 mb-1">Envíanos un mensaje</h2>
-                <p class="text-secondary small mb-4">
-                  Los campos marcados con <span aria-hidden="true">*</span> son obligatorios. Tu
-                  mensaje se almacena en la tabla <code>mensajes_contacto</code>.
-                </p>
+                <h2 class="h4 mb-1">Envíanos un mensaje</h2>
+                <p class="small text-muted-cp mb-4">Los campos marcados con * son obligatorios.</p>
 
                 <div id="alertaContacto" aria-live="polite"></div>
 
-                <form id="formContacto" class="needs-validation" novalidate>
+                <form id="formContacto" novalidate>
                   <div class="row g-3">
                     <div class="col-md-6">
-                      <label class="form-label" for="nombreContacto">Nombre completo *</label>
+                      <label class="form-label" for="nombreContacto">Nombre *</label>
                       <input
+                        type="text"
                         class="form-control"
                         id="nombreContacto"
                         name="nombre"
-                        type="text"
-                        required
                         minlength="2"
                         maxlength="80"
-                        autocomplete="name"
-                        placeholder="Tu nombre"
+                        placeholder="Tu nombre o nick"
+                        required
                       />
-                      <div class="invalid-feedback">Ingresa tu nombre (mínimo 2 caracteres).</div>
+                      <div class="invalid-feedback">Escribe tu nombre (2 a 80 caracteres).</div>
                     </div>
-
                     <div class="col-md-6">
                       <label class="form-label" for="emailContacto">Correo electrónico *</label>
                       <input
+                        type="email"
                         class="form-control"
                         id="emailContacto"
                         name="email"
-                        type="email"
-                        required
                         maxlength="120"
-                        autocomplete="email"
-                        placeholder="nombre@correo.cl"
+                        placeholder="tu@correo.com"
+                        required
                       />
-                      <div class="invalid-feedback">Ingresa un correo electrónico válido.</div>
+                      <div class="invalid-feedback">Ingresa un correo válido.</div>
                     </div>
-
                     <div class="col-12">
                       <label class="form-label" for="asuntoContacto">Asunto *</label>
                       <input
+                        type="text"
                         class="form-control"
                         id="asuntoContacto"
                         name="asunto"
-                        type="text"
-                        required
                         minlength="3"
                         maxlength="120"
-                        placeholder="Ej: Consulta por una notebook"
+                        placeholder="Ej: Sugerencia de ítem"
+                        required
                       />
-                      <div class="invalid-feedback">Ingresa un asunto de entre 3 y 120 caracteres.</div>
+                      <div class="invalid-feedback">Escribe un asunto (3 a 120 caracteres).</div>
                     </div>
-
                     <div class="col-12">
-                      <label class="form-label" for="mensajeContacto">Mensaje *</label>
+                      <div class="d-flex justify-content-between align-items-center">
+                        <label class="form-label mb-0" for="mensajeContacto">Mensaje *</label>
+                        <span class="small text-muted-cp"><span id="contadorMensaje">0</span>/1000</span>
+                      </div>
                       <textarea
-                        class="form-control"
+                        class="form-control mt-1"
                         id="mensajeContacto"
                         name="mensaje"
-                        rows="5"
-                        required
+                        rows="6"
                         minlength="10"
                         maxlength="1000"
-                        placeholder="Cuéntanos qué necesitas, tu presupuesto y para qué usarás el equipo."
+                        placeholder="Cuéntanos tu idea con el mayor detalle posible…"
+                        required
                       ></textarea>
-                      <div class="invalid-feedback">
-                        El mensaje debe tener entre 10 y 1000 caracteres.
-                      </div>
-                      <div class="form-text"><span id="contadorMensaje">0</span>/1000 caracteres</div>
+                      <div class="invalid-feedback">El mensaje debe tener entre 10 y 1000 caracteres.</div>
                     </div>
-
-                    <div class="col-12">
-                      <div class="form-check">
-                        <input class="form-check-input" id="privacidad" type="checkbox" required />
-                        <label class="form-check-label small" for="privacidad">
-                          Acepto que NovaTech Store use mis datos para responder esta consulta. *
-                        </label>
-                        <div class="invalid-feedback">Debes aceptar el uso de tus datos.</div>
-                      </div>
-                    </div>
-
-                    <div class="col-12 d-flex flex-column flex-sm-row align-items-sm-center gap-3">
-                      <button class="btn btn-nt px-4" type="submit" id="btnEnviarContacto">
-                        <span
-                          class="spinner-border spinner-border-sm d-none me-2"
-                          id="spinnerContacto"
-                          aria-hidden="true"
-                        ></span>
+                    <div class="col-12 d-flex flex-column flex-sm-row gap-2 align-items-sm-center">
+                      <button type="submit" class="btn btn-cp btn-lg px-4" id="btnEnviarContacto">
+                        <span class="spinner-border spinner-border-sm me-2 d-none" id="spinnerContacto" aria-hidden="true"></span>
                         <span id="textoEnviar">Enviar mensaje</span>
                       </button>
-                      <span class="small text-secondary">Respondemos en un plazo de 24 horas hábiles.</span>
+                      <span class="small text-muted-cp">Responderemos a la brevedad posible.</span>
                     </div>
                   </div>
                 </form>
@@ -243,9 +208,9 @@
             <div class="col-lg-9">
               <div class="text-center mb-4">
                 <span class="eyebrow">Preguntas frecuentes</span>
-                <h2 class="section-title h2 mb-0">Antes de escribirnos</h2>
+                <h2 class="h1 mb-0">Antes de escribir</h2>
               </div>
-              <div class="accordion" id="acordeonFaq">
+              <div class="accordion" id="faqContacto">
                 <div class="accordion-item">
                   <h3 class="accordion-header">
                     <button
@@ -256,17 +221,13 @@
                       aria-expanded="true"
                       aria-controls="faq1"
                     >
-                      ¿Los productos tienen garantía?
+                      ¿CraftPedia es un sitio oficial de Minecraft?
                     </button>
                   </h3>
-                  <div
-                    id="faq1"
-                    class="accordion-collapse collapse show"
-                    data-bs-parent="#acordeonFaq"
-                  >
-                    <div class="accordion-body text-secondary">
-                      Sí. Todos los productos nuevos incluyen 12 meses de garantía con boleta. La
-                      cobertura considera fallas de fabricación y soporte para la configuración inicial.
+                  <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqContacto">
+                    <div class="accordion-body">
+                      No. Es un proyecto fan sin fines de lucro, creado como evaluación académica.
+                      Minecraft y sus marcas pertenecen a Mojang.
                     </div>
                   </div>
                 </div>
@@ -280,17 +241,14 @@
                       aria-expanded="false"
                       aria-controls="faq2"
                     >
-                      ¿Puedo retirar en tienda?
+                      ¿Cómo se agrega un ítem nuevo?
                     </button>
                   </h3>
-                  <div
-                    id="faq2"
-                    class="accordion-collapse collapse"
-                    data-bs-parent="#acordeonFaq"
-                  >
-                    <div class="accordion-body text-secondary">
-                      Sí. Puedes coordinar el retiro en Av. Providencia 1234 de lunes a viernes. Te
-                      confirmaremos el stock y el horario por correo.
+                  <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqContacto">
+                    <div class="accordion-body">
+                      Entra a <a href="/items.html">Ítems</a>, pulsa “Agregar ítem” y completa el
+                      formulario. El registro se guarda en PostgreSQL y aparece de inmediato en el
+                      catálogo.
                     </div>
                   </div>
                 </div>
@@ -304,17 +262,13 @@
                       aria-expanded="false"
                       aria-controls="faq3"
                     >
-                      ¿El stock del catálogo está actualizado?
+                      ¿Qué ocurre con los mensajes enviados?
                     </button>
                   </h3>
-                  <div
-                    id="faq3"
-                    class="accordion-collapse collapse"
-                    data-bs-parent="#acordeonFaq"
-                  >
-                    <div class="accordion-body text-secondary">
-                      El catálogo consulta la base de datos en tiempo real. Si un producto aparece
-                      agotado, escríbenos y te avisamos cuando vuelva a estar disponible.
+                  <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqContacto">
+                    <div class="accordion-body">
+                      Se validan en el servidor y se almacenan en la tabla
+                      <code>mensajes_contacto</code> de la base de datos <code>craftpedia</code>.
                     </div>
                   </div>
                 </div>
@@ -330,24 +284,20 @@
         <div class="row g-4">
           <div class="col-lg-4">
             <a class="navbar-brand d-inline-flex align-items-center gap-2 mb-3" href="/">
-              <span class="brand-mark"><i class="bi bi-cpu" aria-hidden="true"></i></span>
-              <span>NovaTech <span class="text-info">Store</span></span>
+              <span class="brand-block" aria-hidden="true"></span>
+              <span>Craft<span class="text-success">Pedia</span></span>
             </a>
             <p class="small">
-              Tienda tecnológica de Santiago. Notebooks, smartphones, audio y redes con asesoría
-              especializada y stock actualizado.
+              Enciclopedia fan de Minecraft creada para la evaluación INF211. Ítems, guías y datos
+              almacenados en PostgreSQL.
             </p>
-            <div class="d-flex gap-2 mt-3">
-              <a class="social-link" href="#" aria-label="Instagram"><i class="bi bi-instagram" aria-hidden="true"></i></a>
-              <a class="social-link" href="#" aria-label="Facebook"><i class="bi bi-facebook" aria-hidden="true"></i></a>
-              <a class="social-link" href="#" aria-label="LinkedIn"><i class="bi bi-linkedin" aria-hidden="true"></i></a>
-            </div>
           </div>
           <div class="col-6 col-lg-2">
             <h5 class="h6 mb-3">Explorar</h5>
             <ul class="list-unstyled small d-grid gap-2 mb-0">
               <li><a href="/">Inicio</a></li>
-              <li><a href="/productos.html">Productos</a></li>
+              <li><a href="/items.html">Ítems</a></li>
+              <li><a href="/guias.html">Guías</a></li>
               <li><a href="/nosotros.html">Nosotros</a></li>
               <li><a href="/contacto.html">Contacto</a></li>
             </ul>
@@ -355,26 +305,28 @@
           <div class="col-6 col-lg-2">
             <h5 class="h6 mb-3">Categorías</h5>
             <ul class="list-unstyled small d-grid gap-2 mb-0">
-              <li><a href="/productos.html?categoria=1">Computación</a></li>
-              <li><a href="/productos.html?categoria=2">Móviles</a></li>
-              <li><a href="/productos.html?categoria=3">Audio</a></li>
-              <li><a href="/productos.html?categoria=4">Redes</a></li>
+              <li><a href="/items.html?categoria=1">Bloques</a></li>
+              <li><a href="/items.html?categoria=2">Herramientas</a></li>
+              <li><a href="/items.html?categoria=3">Armaduras</a></li>
+              <li><a href="/items.html?categoria=4">Comida</a></li>
+              <li><a href="/items.html?categoria=5">Redstone</a></li>
+              <li><a href="/items.html?categoria=6">Mobs</a></li>
             </ul>
           </div>
           <div class="col-lg-4">
-            <h5 class="h6 mb-3">Contacto</h5>
+            <h5 class="h6 mb-3">Estado del proyecto</h5>
             <ul class="list-unstyled small d-grid gap-2 mb-3">
-              <li><i class="bi bi-geo-alt me-2" aria-hidden="true"></i>Av. Providencia 1234, Santiago</li>
-              <li><i class="bi bi-telephone me-2" aria-hidden="true"></i>+56 2 2345 6789</li>
-              <li><i class="bi bi-envelope me-2" aria-hidden="true"></i>hola@novatech.cl</li>
+              <li><i class="bi bi-hdd-network me-2" aria-hidden="true"></i>Express + PostgreSQL</li>
+              <li><i class="bi bi-bootstrap me-2" aria-hidden="true"></i>Bootstrap 5 local</li>
+              <li><i class="bi bi-code-slash me-2" aria-hidden="true"></i>HTML semántico y JS modular</li>
             </ul>
-            <span class="small text-white-50 d-block mb-1">Estado del servicio</span>
+            <span class="small text-white-50 d-block mb-1">Conexión a la base de datos</span>
             <span class="badge text-bg-secondary" id="estadoApi">Verificando…</span>
           </div>
         </div>
         <div class="footer-bottom d-flex flex-column flex-md-row justify-content-between gap-2">
-          <span>© <span data-anio></span> NovaTech Store. Proyecto académico INF211.</span>
-          <span>HTML semántico · Bootstrap · Express · PostgreSQL</span>
+          <span>© <span data-anio></span> CraftPedia. Proyecto académico INF211.</span>
+          <span>Fan site no oficial · Minecraft es una marca de Mojang</span>
         </div>
       </div>
     </footer>
