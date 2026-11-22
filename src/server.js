@@ -5,8 +5,9 @@ const express = require("express");
 
 const { pool, probarConexion } = require("./db");
 const { ErrorHttp, asyncHandler } = require("./utils/http");
-const categoriasRouter = require("./routes/categorias");
-const productosRouter = require("./routes/productos");
+const metaRouter = require("./routes/meta");
+const itemsRouter = require("./routes/items");
+const guiasRouter = require("./routes/guias");
 const contactoRouter = require("./routes/contacto");
 const estadisticasRouter = require("./routes/estadisticas");
 
@@ -83,8 +84,9 @@ app.get(
   })
 );
 
-app.use("/api/categorias", categoriasRouter);
-app.use("/api/productos", productosRouter);
+app.use("/api/meta", metaRouter);
+app.use("/api/items", itemsRouter);
+app.use("/api/guias", guiasRouter);
 app.use("/api/contacto", contactoRouter);
 app.use("/api/estadisticas", estadisticasRouter);
 
@@ -141,7 +143,7 @@ async function iniciar() {
   console.log(`Conectado a PostgreSQL (base de datos: ${info.base_datos}).`);
 
   const servidor = app.listen(PORT, () => {
-    console.log(`NovaTech Store disponible en http://localhost:${PORT}`);
+    console.log(`CraftPedia disponible en http://localhost:${PORT}`);
   });
 
   const cerrar = () => {

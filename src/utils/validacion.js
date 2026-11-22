@@ -81,10 +81,26 @@ function correo(valor, campo = "email") {
 }
 
 /**
+ * Valida que un valor pertenezca a una lista cerrada.
+ */
+function opcion(valor, campo, permitidos) {
+  const limpio = texto(valor, campo, { min: 1, max: 40 });
+
+  if (!permitidos.includes(limpio)) {
+    throw new ErrorHttp(
+      400,
+      `El campo "${campo}" debe ser uno de: ${permitidos.join(", ")}.`
+    );
+  }
+
+  return limpio;
+}
+
+/**
  * Normaliza valores provenientes de formularios o JSON.
  */
 function booleano(valor) {
   return valor === true || valor === 1 || valor === "1" || valor === "true" || valor === "on";
 }
 
-module.exports = { texto, entero, decimal, correo, booleano };
+module.exports = { texto, entero, decimal, correo, opcion, booleano };

@@ -26,7 +26,7 @@ router.post(
     );
 
     res.status(201).json({
-      mensaje: "Tu mensaje fue enviado correctamente. Te responderemos a la brevedad.",
+      mensaje: "Tu mensaje fue enviado correctamente. ¡Gracias por aportar a la comunidad!",
       registro: insertados[0]
     });
   })
