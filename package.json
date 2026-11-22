@@ -1,7 +1,7 @@
 {
-  "name": "novatech-store-inf211",
+  "name": "craftpedia-inf211",
   "version": "1.0.0",
-  "description": "Sitio web NovaTech Store con catálogo conectado a PostgreSQL (Evaluación Parcial INF211)",
+  "description": "CraftPedia: enciclopedia fan de Minecraft con Express y PostgreSQL (Evaluación Parcial INF211)",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
@@ -11,6 +11,7 @@
     "express",
     "postgresql",
     "bootstrap",
+    "minecraft",
     "inf211"
   ],
   "author": "Estudiante INF211",
