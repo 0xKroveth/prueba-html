@@ -1,0 +1,27 @@
+{
+  "name": "novatech-store-inf211",
+  "version": "1.0.0",
+  "description": "Sitio web NovaTech Store con catálogo conectado a PostgreSQL (Evaluación Parcial INF211)",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "keywords": [
+    "express",
+    "postgresql",
+    "bootstrap",
+    "inf211"
+  ],
+  "author": "Estudiante INF211",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "pg": "^8.13.1"
+  }
+}
