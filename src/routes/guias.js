@@ -1,3 +1,5 @@
+// rutas de guias (leer y filtrar)
+
 const { Router } = require("express");
 const { consultar } = require("../db");
 const { asyncHandler, ErrorHttp } = require("../utils/http");
@@ -6,6 +8,7 @@ const { DIFICULTADES, ORDENES_GUIAS } = require("../constantes");
 
 const router = Router();
 
+// campos que necesito de la guia
 const CAMPOS_GUIA = `
   g.guia_id,
   g.titulo,
@@ -20,7 +23,7 @@ const CAMPOS_GUIA = `
   g.creado_en
 `;
 
-/** GET /api/guias/temas: temas disponibles para el filtro. */
+// GET /api/guias/temas - temas para el filtro
 router.get(
   "/temas",
   asyncHandler(async (_req, res) => {
@@ -29,10 +32,7 @@ router.get(
   })
 );
 
-/**
- * GET /api/guias
- * Lectura con filtros por texto, dificultad, tema, versión y destacadas.
- */
+// GET /api/guias - lectura con filtros
 router.get(
   "/",
   asyncHandler(async (req, res) => {
@@ -74,7 +74,7 @@ router.get(
   })
 );
 
-/** GET /api/guias/:id */
+// GET /api/guias/:id - una guia por su id
 router.get(
   "/:id",
   asyncHandler(async (req, res) => {

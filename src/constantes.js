@@ -1,6 +1,9 @@
+// valores fijos que uso en varias partes
+
 const RAREZAS = ["Común", "Poco común", "Raro", "Épico", "Legendario"];
 const DIFICULTADES = ["Principiante", "Intermedio", "Avanzado"];
 
+// como ordenar los items en las consultas sql
 const ORDENES_ITEMS = {
   nombre: "i.nombre ASC",
   recientes: "i.creado_en DESC",
@@ -14,6 +17,7 @@ const ORDENES_ITEMS = {
            END ASC, i.nombre ASC`
 };
 
+// como ordenar las guias
 const ORDENES_GUIAS = {
   titulo: "g.titulo ASC",
   recientes: "g.creado_en DESC",

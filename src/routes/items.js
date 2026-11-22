@@ -1,3 +1,5 @@
+// rutas de items (leer, filtrar, crear)
+
 const { Router } = require("express");
 const { consultar } = require("../db");
 const { asyncHandler, ErrorHttp } = require("../utils/http");
@@ -6,6 +8,7 @@ const { RAREZAS, ORDENES_ITEMS } = require("../constantes");
 
 const router = Router();
 
+// campos que necesito del item con su categoria
 const CAMPOS_ITEM = `
   i.item_id,
   i.nombre,
@@ -23,6 +26,7 @@ const CAMPOS_ITEM = `
   c.icono AS categoria_icono
 `;
 
+// busca un item por su id
 async function buscarPorId(itemId) {
   const filas = await consultar(
     `SELECT ${CAMPOS_ITEM}
@@ -34,7 +38,7 @@ async function buscarPorId(itemId) {
   return filas[0] || null;
 }
 
-/** GET /api/items/versiones: versiones disponibles para el filtro. */
+// GET /api/items/versiones - versiones para el filtro
 router.get(
   "/versiones",
   asyncHandler(async (_req, res) => {
@@ -45,10 +49,7 @@ router.get(
   })
 );
 
-/**
- * GET /api/items
- * Lectura con filtros por categoría, texto, rareza, versión y destacados.
- */
+// GET /api/items - lectura con filtros
 router.get(
   "/",
   asyncHandler(async (req, res) => {
@@ -91,7 +92,7 @@ router.get(
   })
 );
 
-/** GET /api/items/:id */
+// GET /api/items/:id - un item por su id
 router.get(
   "/:id",
   asyncHandler(async (req, res) => {
@@ -106,15 +107,13 @@ router.get(
   })
 );
 
-/**
- * POST /api/items
- * Inserción de un ítem validado en el servidor.
- */
+// POST /api/items - crear un item nuevo
 router.post(
   "/",
   asyncHandler(async (req, res) => {
     const datos = req.body ?? {};
 
+    // valido todos los campos
     const nuevo = {
       nombre: texto(datos.nombre, "nombre", { min: 2, max: 100 }),
       descripcion: texto(datos.descripcion, "descripcion", { min: 10, max: 500 }),
@@ -127,6 +126,7 @@ router.post(
       destacado: booleano(datos.destacado)
     };
 
+    // verifico que la categoria exista
     const categorias = await consultar(
       "SELECT categoria_id FROM categorias WHERE categoria_id = $1",
       [nuevo.categoria_id]
@@ -154,6 +154,7 @@ router.post(
       ]
     );
 
+    // devuelvo el item completo con la categoria
     const item = await buscarPorId(insertados[0].item_id);
 
     res.status(201).json({

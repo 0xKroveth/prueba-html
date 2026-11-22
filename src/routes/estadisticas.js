@@ -1,10 +1,12 @@
+// ruta de estadisticas para la pagina de inicio
+
 const { Router } = require("express");
 const { consultar } = require("../db");
 const { asyncHandler } = require("../utils/http");
 
 const router = Router();
 
-/** GET /api/estadisticas: indicadores para la página de inicio. */
+// GET /api/estadisticas - totales para los contadores del inicio
 router.get(
   "/",
   asyncHandler(async (_req, res) => {

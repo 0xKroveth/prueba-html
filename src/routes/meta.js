@@ -1,3 +1,5 @@
+// ruta de metadatos para llenar los selects de filtros
+
 const { Router } = require("express");
 const { consultar } = require("../db");
 const { asyncHandler } = require("../utils/http");
@@ -5,13 +7,11 @@ const { RAREZAS, DIFICULTADES } = require("../constantes");
 
 const router = Router();
 
-/**
- * GET /api/meta
- * Opciones de filtros y categorías con su cantidad de ítems.
- */
+// GET /api/meta - categorias, versiones, temas, rarezas y dificultades
 router.get(
   "/",
   asyncHandler(async (_req, res) => {
+    // hago las 3 consultas en paralelo para que sea mas rapido
     const [categorias, versiones, temas] = await Promise.all([
       consultar(
         `SELECT

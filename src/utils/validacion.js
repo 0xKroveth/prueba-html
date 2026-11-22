@@ -1,8 +1,8 @@
+// funciones de validacion para los datos que llegan al backend
+
 const { ErrorHttp } = require("./http");
 
-/**
- * Valida y normaliza un texto.
- */
+// valida que sea texto y que tenga el largo correcto
 function texto(valor, campo, { min = 1, max = 255, obligatorio = true } = {}) {
   if (valor === undefined || valor === null || String(valor).trim() === "") {
     if (!obligatorio) return "";
@@ -25,9 +25,7 @@ function texto(valor, campo, { min = 1, max = 255, obligatorio = true } = {}) {
   return limpio;
 }
 
-/**
- * Valida un número entero dentro de un rango.
- */
+// valida que sea un numero entero dentro de un rango
 function entero(valor, campo, { min = 0, max = Number.MAX_SAFE_INTEGER, obligatorio = true } = {}) {
   if (valor === undefined || valor === null || valor === "") {
     if (!obligatorio) return null;
@@ -46,9 +44,7 @@ function entero(valor, campo, { min = 0, max = Number.MAX_SAFE_INTEGER, obligato
   return numero;
 }
 
-/**
- * Valida un número decimal y lo redondea a dos decimales.
- */
+// valida un numero decimal y lo redondea a 2 decimales
 function decimal(valor, campo, { min = 0, max = Number.MAX_SAFE_INTEGER, obligatorio = true } = {}) {
   if (valor === undefined || valor === null || valor === "") {
     if (!obligatorio) return null;
@@ -67,9 +63,7 @@ function decimal(valor, campo, { min = 0, max = Number.MAX_SAFE_INTEGER, obligat
   return Math.round(numero * 100) / 100;
 }
 
-/**
- * Valida un correo electrónico con un formato básico.
- */
+// valida un correo basico
 function correo(valor, campo = "email") {
   const limpio = texto(valor, campo, { min: 5, max: 120 });
 
@@ -80,9 +74,7 @@ function correo(valor, campo = "email") {
   return limpio.toLowerCase();
 }
 
-/**
- * Valida que un valor pertenezca a una lista cerrada.
- */
+// valida que el valor este en la lista de opciones permitidas
 function opcion(valor, campo, permitidos) {
   const limpio = texto(valor, campo, { min: 1, max: 40 });
 
@@ -96,9 +88,7 @@ function opcion(valor, campo, permitidos) {
   return limpio;
 }
 
-/**
- * Normaliza valores provenientes de formularios o JSON.
- */
+// convierte valores tipo "true", "1", "on" a booleano
 function booleano(valor) {
   return valor === true || valor === 1 || valor === "1" || valor === "true" || valor === "on";
 }

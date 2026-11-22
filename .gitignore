@@ -5,3 +5,5 @@ node_modules/
 Thumbs.db
 coverage/
 .nyc_output/
+graphify-out/
+EvP3_INF211_2026.pdf

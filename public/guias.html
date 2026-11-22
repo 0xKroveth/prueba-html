@@ -40,8 +40,6 @@
             <li class="nav-item">
               <a class="nav-link active" aria-current="page" href="/guias.html">Guías</a>
             </li>
-            <li class="nav-item"><a class="nav-link" href="/nosotros.html">Nosotros</a></li>
-            <li class="nav-item"><a class="nav-link" href="/contacto.html">Contacto</a></li>
             <li class="nav-item ms-lg-2">
               <a class="btn btn-cp btn-sm px-3" href="/items.html">Explorar ítems</a>
             </li>
@@ -66,11 +64,6 @@
                 Desde tu primera noche hasta el dragón del End. Filtra por dificultad, tema o
                 versión y abre la guía completa.
               </p>
-            </div>
-            <div class="col-lg-4 text-lg-end">
-              <a class="btn btn-cp-gold btn-lg" href="/contacto.html">
-                <i class="bi bi-lightbulb me-2" aria-hidden="true"></i>Sugerir una guía
-              </a>
             </div>
           </div>
         </div>
@@ -133,54 +126,9 @@
     </main>
 
     <footer class="footer">
-      <div class="container">
-        <div class="row g-4">
-          <div class="col-lg-4">
-            <a class="navbar-brand d-inline-flex align-items-center gap-2 mb-3" href="/">
-              <span class="brand-block" aria-hidden="true"></span>
-              <span>Craft<span class="text-success">Pedia</span></span>
-            </a>
-            <p class="small">
-              Enciclopedia fan de Minecraft creada para la evaluación INF211. Ítems, guías y datos
-              almacenados en PostgreSQL.
-            </p>
-          </div>
-          <div class="col-6 col-lg-2">
-            <h5 class="h6 mb-3">Explorar</h5>
-            <ul class="list-unstyled small d-grid gap-2 mb-0">
-              <li><a href="/">Inicio</a></li>
-              <li><a href="/items.html">Ítems</a></li>
-              <li><a href="/guias.html">Guías</a></li>
-              <li><a href="/nosotros.html">Nosotros</a></li>
-              <li><a href="/contacto.html">Contacto</a></li>
-            </ul>
-          </div>
-          <div class="col-6 col-lg-2">
-            <h5 class="h6 mb-3">Categorías</h5>
-            <ul class="list-unstyled small d-grid gap-2 mb-0">
-              <li><a href="/items.html?categoria=1">Bloques</a></li>
-              <li><a href="/items.html?categoria=2">Herramientas</a></li>
-              <li><a href="/items.html?categoria=3">Armaduras</a></li>
-              <li><a href="/items.html?categoria=4">Comida</a></li>
-              <li><a href="/items.html?categoria=5">Redstone</a></li>
-              <li><a href="/items.html?categoria=6">Mobs</a></li>
-            </ul>
-          </div>
-          <div class="col-lg-4">
-            <h5 class="h6 mb-3">Estado del proyecto</h5>
-            <ul class="list-unstyled small d-grid gap-2 mb-3">
-              <li><i class="bi bi-hdd-network me-2" aria-hidden="true"></i>Express + PostgreSQL</li>
-              <li><i class="bi bi-bootstrap me-2" aria-hidden="true"></i>Bootstrap 5 local</li>
-              <li><i class="bi bi-code-slash me-2" aria-hidden="true"></i>HTML semántico y JS modular</li>
-            </ul>
-            <span class="small text-white-50 d-block mb-1">Conexión a la base de datos</span>
-            <span class="badge text-bg-secondary" id="estadoApi">Verificando…</span>
-          </div>
-        </div>
-        <div class="footer-bottom d-flex flex-column flex-md-row justify-content-between gap-2">
-          <span>© <span data-anio></span> CraftPedia. Proyecto académico INF211.</span>
-          <span>Fan site no oficial · Minecraft es una marca de Mojang</span>
-        </div>
+      <div class="container text-center">
+        <p class="mb-1 fw-bold">CTF Estatal</p>
+        <p class="mb-0 small">Hecho por Matías Quiroz</p>
       </div>
     </footer>
 
@@ -208,16 +156,14 @@
             <div class="guia-meta mb-3" id="detalleGuiaMeta"></div>
             <div class="guia-contenido" id="detalleGuiaContenido"></div>
           </div>
-          <div class="modal-footer justify-content-between">
+          <div class="modal-footer justify-content-end">
             <button type="button" class="btn btn-cp-outline" data-bs-dismiss="modal">Cerrar</button>
-            <a class="btn btn-cp" href="/contacto.html">Sugerir una corrección</a>
           </div>
         </div>
       </div>
     </div>
 
     <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script type="module" src="/js/comun.js"></script>
-    <script type="module" src="/js/guias.js"></script>
+    <script src="/js/app.js"></script>
   </body>
 </html>

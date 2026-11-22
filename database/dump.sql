@@ -151,38 +151,7 @@ CREATE SEQUENCE public.items_item_id_seq
 ALTER SEQUENCE public.items_item_id_seq OWNED BY public.items.item_id;
 
 
---
--- Name: mensajes_contacto; Type: TABLE; Schema: public; Owner: -
---
 
-CREATE TABLE public.mensajes_contacto (
-    mensaje_id integer NOT NULL,
-    nombre character varying(80) NOT NULL,
-    email character varying(120) NOT NULL,
-    asunto character varying(120) NOT NULL,
-    mensaje character varying(1000) NOT NULL,
-    creado_en timestamp with time zone DEFAULT now() NOT NULL
-);
-
-
---
--- Name: mensajes_contacto_mensaje_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.mensajes_contacto_mensaje_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: mensajes_contacto_mensaje_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.mensajes_contacto_mensaje_id_seq OWNED BY public.mensajes_contacto.mensaje_id;
 
 
 --
@@ -205,12 +174,6 @@ ALTER TABLE ONLY public.guias ALTER COLUMN guia_id SET DEFAULT nextval('public.g
 
 ALTER TABLE ONLY public.items ALTER COLUMN item_id SET DEFAULT nextval('public.items_item_id_seq'::regclass);
 
-
---
--- Name: mensajes_contacto mensaje_id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.mensajes_contacto ALTER COLUMN mensaje_id SET DEFAULT nextval('public.mensajes_contacto_mensaje_id_seq'::regclass);
 
 
 --
@@ -275,14 +238,6 @@ COPY public.items (item_id, nombre, descripcion, obtencion, categoria_id, rareza
 \.
 
 
---
--- Data for Name: mensajes_contacto; Type: TABLE DATA; Schema: public; Owner: -
---
-
-COPY public.mensajes_contacto (mensaje_id, nombre, email, asunto, mensaje, creado_en) FROM stdin;
-1	Steve	steve@example.com	Sugerencia de guía	Hola, me gustaría ver una guía sobre cómo conseguir netherite sin morir en el intento. ¡Gracias!	2026-11-22 19:31:35.514445+00
-\.
-
 
 --
 -- Name: categorias_categoria_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
@@ -304,12 +259,6 @@ SELECT pg_catalog.setval('public.guias_guia_id_seq', 9, true);
 
 SELECT pg_catalog.setval('public.items_item_id_seq', 23, true);
 
-
---
--- Name: mensajes_contacto_mensaje_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('public.mensajes_contacto_mensaje_id_seq', 1, true);
 
 
 --
@@ -351,13 +300,6 @@ ALTER TABLE ONLY public.guias
 ALTER TABLE ONLY public.items
     ADD CONSTRAINT items_pkey PRIMARY KEY (item_id);
 
-
---
--- Name: mensajes_contacto mensajes_contacto_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.mensajes_contacto
-    ADD CONSTRAINT mensajes_contacto_pkey PRIMARY KEY (mensaje_id);
 
 
 --
