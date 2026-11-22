@@ -32,7 +32,7 @@ Vista móvil: ![Vista móvil](docs/capturas/movil.webp)
 | Capa | Tecnología |
 | --- | --- |
 | Frontend | HTML5 semántico, CSS3, JavaScript (módulos ES), Bootstrap 5.3.3 y Bootstrap Icons |
-| Backend | Node.js, Express 4, `pg`, `cors`, `dotenv` |
+| Backend | Node.js, Express 4, `pg`, `dotenv` |
 | Base de datos | PostgreSQL 14+ |
 | Control de versiones | Git |
 

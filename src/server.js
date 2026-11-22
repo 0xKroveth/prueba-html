@@ -2,7 +2,6 @@ require("dotenv").config();
 
 const path = require("path");
 const express = require("express");
-const cors = require("cors");
 
 const { pool, probarConexion } = require("./db");
 const { ErrorHttp, asyncHandler } = require("./utils/http");
@@ -28,16 +27,40 @@ const origenesPermitidos = new Set(
 );
 
 app.disable("x-powered-by");
-app.use(
-  cors({
-    origin(origen, callback) {
-      if (!origen || origenesPermitidos.has(origen)) {
-        return callback(null, true);
-      }
-      return callback(new ErrorHttp(403, "Origen no permitido por CORS."));
-    }
-  })
-);
+
+// CORS: permite el mismo origen del sitio y los orígenes configurados.
+app.use((req, res, next) => {
+  const origen = req.headers.origin;
+
+  if (!origen) {
+    return next();
+  }
+
+  let mismoOrigen = false;
+
+  try {
+    const url = new URL(origen);
+    const host = req.headers["x-forwarded-host"] || req.headers.host;
+    mismoOrigen = url.host === host;
+  } catch {
+    mismoOrigen = false;
+  }
+
+  if (!mismoOrigen && !origenesPermitidos.has(origen)) {
+    return next(new ErrorHttp(403, "Origen no permitido por CORS."));
+  }
+
+  res.setHeader("Access-Control-Allow-Origin", origen);
+  res.setHeader("Vary", "Origin");
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") {
+    return res.status(204).end();
+  }
+
+  return next();
+});
 app.use(express.json({ limit: "100kb" }));
 
 // API
