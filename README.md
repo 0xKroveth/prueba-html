@@ -99,7 +99,7 @@ estático con **Bootstrap 5**. Permite leer, filtrar e insertar datos reales des
 
 ```bash
 git clone <URL_DEL_REPOSITORIO>
-cd backend-consulta-postgresql-main
+cd evaluacion
 npm install
 cp .env.example .env
 ```
