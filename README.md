@@ -105,6 +105,16 @@ sudo -u postgres createdb demo_web
 sudo -u postgres psql -d demo_web -f database/dump.sql
 ```
 
+> Si importas con `postgres` pero el backend se conecta como `demo_user`, entrega los permisos
+> necesarios:
+>
+> ```sql
+> GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO demo_user;
+> GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO demo_user;
+> ```
+>
+> La opción recomendada (importar como `demo_user`) evita este paso.
+
 Verifica la carga:
 
 ```bash
