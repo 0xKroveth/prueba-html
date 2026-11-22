@@ -223,7 +223,7 @@ COPY public.categorias (categoria_id, nombre, descripcion, icono, slug, creado_e
 3	Armaduras	Protección para sobrevivir al Nether, al End y a todo lo demás.	diamond_chestplate	armaduras	2026-11-22 19:31:35.507867+00
 4	Comida	Alimentos para recuperar hambre y activar efectos especiales.	apple	comida	2026-11-22 19:31:35.507867+00
 5	Redstone	Circuitos, pistones y automatización para tus granjas.	redstone	redstone	2026-11-22 19:31:35.507867+00
-6	Mobs	Criaturas pacíficas, neutrales y hostiles del mundo.	gunpowder	mobs	2026-11-22 19:31:35.507867+00
+6	Mobs	Criaturas pacíficas, neutrales y hostiles del mundo.	creeper_face	mobs	2026-11-22 19:31:35.507867+00
 \.
 
 
@@ -266,12 +266,12 @@ COPY public.items (item_id, nombre, descripcion, obtencion, categoria_id, rareza
 15	Estofado de hongos	Comida que recupera mucha hambre y puede dejar un cuenco vacío al consumirse.	Crafteando con un cuenco, un hongo rojo y un hongo marrón.	4	Poco común	1.21	1	mushroom_stew	f	2026-11-22 19:31:35.509788+00
 16	Bloque de redstone	Bloque compacto de redstone. También se usa como fuente de energía en algunos circuitos.	Combinando 9 polvos de redstone en una mesa de crafteo.	5	Poco común	1.21	64	redstone_block	f	2026-11-22 19:31:35.509788+00
 17	Pistón	Componente de redstone que empuja bloques y entidades. Base de muchas granjas automáticas.	Crafteando con madera, piedra, hierro y redstone.	5	Poco común	1.21	64	piston	f	2026-11-22 19:31:35.509788+00
-18	Creeper	Mob hostil que se acerca en silencio y explota. Nunca lo dejes llegar a tu base.	Aparece de noche o en cuevas; explota al acercarte.	6	Raro	1.21	1	gunpowder	t	2026-11-22 19:31:35.509788+00
-19	Enderman	Mob neutral que se teletransporta y se vuelve hostil si lo miras a los ojos.	Aparece en el End, en el Nether y en cuevas oscuras.	6	Épico	1.21	1	ender_pearl	f	2026-11-22 19:31:35.509788+00
-20	Aldeano	Habitante de las aldeas con el que puedes comerciar. Cada profesión ofrece intercambios distintos.	Aparece en aldeas; puedes comerciar con él.	6	Común	1.20	1	emerald	f	2026-11-22 19:31:35.509788+00
 21	Pechera de diamante	La pieza central de la armadura de diamante. Cubre el torso y aporta 8 puntos de armadura.	Craftea con 8 diamantes en una mesa de trabajo.	3	Raro	1.21	1	diamond_chestplate	f	2026-11-22 20:12:07.393996+00
 22	Pantalón de diamante	Protege las piernas y completa el conjunto de diamante. Aporta 6 puntos de armadura.	Craftea con 7 diamantes en una mesa de trabajo.	3	Raro	1.21	1	diamond_leggings	f	2026-11-22 20:12:07.393996+00
 23	Botas de diamante	Protegen los pies y reducen el daño de caída. Aportan 3 puntos de armadura.	Craftea con 4 diamantes en una mesa de trabajo.	3	Raro	1.21	1	diamond_boots	f	2026-11-22 20:12:07.393996+00
+18	Creeper	Mob hostil que se acerca en silencio y explota. Nunca lo dejes llegar a tu base.	Aparece de noche o en cuevas; explota al acercarte.	6	Raro	1.21	1	creeper_face	t	2026-11-22 19:31:35.509788+00
+19	Enderman	Mob neutral que se teletransporta y se vuelve hostil si lo miras a los ojos.	Aparece en el End, en el Nether y en cuevas oscuras.	6	Épico	1.21	1	enderman_face	f	2026-11-22 19:31:35.509788+00
+20	Aldeano	Habitante de las aldeas con el que puedes comerciar. Cada profesión ofrece intercambios distintos.	Aparece en aldeas; puedes comerciar con él.	6	Común	1.20	1	villager_face	f	2026-11-22 19:31:35.509788+00
 \.
 
 
