@@ -22,6 +22,31 @@ export function claseDificultad(dificultad) {
   return CLASES_DIFICULTAD[dificultad] || "dificultad--principiante";
 }
 
+const PATRON_ICONO = /^[a-z0-9_]+$/;
+
+/**
+ * Crea el icono de un ítem, categoría o guía.
+ * Las claves (por ejemplo "diamond_sword") cargan la textura real incluida
+ * en /assets/minecraft; cualquier otro valor se muestra como texto.
+ */
+export function crearIconoMinecraft(icono, { className = "" } = {}) {
+  if (typeof icono === "string" && PATRON_ICONO.test(icono)) {
+    const imagen = document.createElement("img");
+    imagen.src = `/assets/minecraft/${icono}.png`;
+    imagen.alt = "";
+    imagen.decoding = "async";
+    imagen.className = `icono-minecraft${className ? ` ${className}` : ""}`;
+    imagen.setAttribute("aria-hidden", "true");
+    return imagen;
+  }
+
+  const texto = document.createElement("span");
+  texto.className = className;
+  texto.textContent = icono ?? "";
+  texto.setAttribute("aria-hidden", "true");
+  return texto;
+}
+
 /**
  * Crea una tarjeta de ítem usando DOM seguro (sin inyectar datos como HTML).
  */
@@ -35,10 +60,7 @@ export function crearTarjetaItem(item, { alVer = null } = {}) {
   const visual = document.createElement("div");
   visual.className = `item-visual item-visual--${item.categoria_slug || "bloques"}`;
 
-  const icono = document.createElement("span");
-  icono.textContent = item.icono;
-  icono.setAttribute("aria-hidden", "true");
-  visual.append(icono);
+  visual.append(crearIconoMinecraft(item.icono));
 
   if (item.destacado) {
     const destacado = document.createElement("span");
@@ -49,7 +71,10 @@ export function crearTarjetaItem(item, { alVer = null } = {}) {
 
   const categoria = document.createElement("span");
   categoria.className = "badge-categoria";
-  categoria.textContent = `${item.categoria_icono} ${item.categoria}`;
+  categoria.append(
+    crearIconoMinecraft(item.categoria_icono),
+    document.createTextNode(` ${item.categoria}`)
+  );
   visual.append(categoria);
 
   const cuerpo = document.createElement("div");
@@ -121,8 +146,8 @@ export function crearTarjetaGuia(guia, { alVer = null } = {}) {
 
   const icono = document.createElement("div");
   icono.className = "guia-icon";
-  icono.textContent = guia.icono;
   icono.setAttribute("aria-hidden", "true");
+  icono.append(crearIconoMinecraft(guia.icono));
 
   const contenido = document.createElement("div");
   contenido.className = "flex-grow-1 d-flex flex-column";

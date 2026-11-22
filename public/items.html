@@ -226,7 +226,9 @@
             <div class="row g-4">
               <div class="col-md-5">
                 <div class="item-visual" id="detalleItemVisual">
-                  <span id="detalleItemIcono" aria-hidden="true">🧱</span>
+                  <span id="detalleItemIcono" aria-hidden="true">
+                    <img class="icono-minecraft" src="/assets/minecraft/grass_block.png" alt="" />
+                  </span>
                   <span class="badge-destacado d-none" id="detalleItemDestacado">Destacado</span>
                   <span class="badge-categoria" id="detalleItemCategoria">Categoría</span>
                 </div>
@@ -285,17 +287,23 @@
                   <div class="invalid-feedback">Escribe un nombre de entre 2 y 100 caracteres.</div>
                 </div>
                 <div class="col-md-4">
-                  <label class="form-label" for="iconoItem">Icono (emoji) *</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="iconoItem"
-                    name="icono"
-                    value="🧱"
-                    maxlength="16"
-                    required
-                  />
-                  <div class="invalid-feedback">Indica un emoji o símbolo.</div>
+                  <label class="form-label" for="iconoItem">Icono *</label>
+                  <select class="form-select" id="iconoItem" name="icono" required>
+                    <option value="diamond">Diamante</option>
+                    <option value="diamond_pickaxe">Pico de diamante</option>
+                    <option value="netherite_sword">Espada de netherita</option>
+                    <option value="diamond_chestplate">Pechera de diamante</option>
+                    <option value="golden_apple">Manzana dorada</option>
+                    <option value="bread">Pan</option>
+                    <option value="redstone">Redstone</option>
+                    <option value="grass_block">Bloque de hierba</option>
+                    <option value="iron_block">Bloque de hierro</option>
+                    <option value="elytra">Elytra</option>
+                    <option value="emerald">Esmeralda</option>
+                    <option value="gunpowder">Pólvora</option>
+                  </select>
+                  <div class="icono-preview mt-2" id="vistaPreviaIcono" aria-hidden="true"></div>
+                  <div class="invalid-feedback">Selecciona un icono.</div>
                 </div>
 
                 <div class="col-md-6">
@@ -370,20 +378,6 @@
                     required
                   ></textarea>
                   <div class="invalid-feedback">Escribe una descripción de 10 a 500 caracteres.</div>
-                </div>
-
-                <div class="col-12">
-                  <span class="form-label d-block">Iconos rápidos</span>
-                  <div class="d-flex flex-wrap gap-2">
-                    <button type="button" class="btn btn-sm btn-cp-outline" data-icono="💎">💎</button>
-                    <button type="button" class="btn btn-sm btn-cp-outline" data-icono="⛏">⛏</button>
-                    <button type="button" class="btn btn-sm btn-cp-outline" data-icono="🗡">🗡</button>
-                    <button type="button" class="btn btn-sm btn-cp-outline" data-icono="🛡">🛡</button>
-                    <button type="button" class="btn btn-sm btn-cp-outline" data-icono="🍎">🍎</button>
-                    <button type="button" class="btn btn-sm btn-cp-outline" data-icono="🔴">🔴</button>
-                    <button type="button" class="btn btn-sm btn-cp-outline" data-icono="🐷">🐷</button>
-                    <button type="button" class="btn btn-sm btn-cp-outline" data-icono="🧱">🧱</button>
-                  </div>
                 </div>
 
                 <div class="col-12">

@@ -1,6 +1,7 @@
 import { solicitar } from "./api.js";
 import {
   claseDificultad,
+  crearIconoMinecraft,
   crearTarjetaGuia,
   limpiarAlerta,
   mostrarAlerta,
@@ -116,9 +117,9 @@ function renderizarGuias(guias) {
     vacio.className = "empty-state";
 
     const icono = document.createElement("div");
-    icono.className = "fs-1 emoji";
-    icono.textContent = "📖";
+    icono.className = "empty-icon";
     icono.setAttribute("aria-hidden", "true");
+    icono.append(crearIconoMinecraft("book"));
 
     const titulo = document.createElement("h2");
     titulo.className = "h5 mt-3";
@@ -191,7 +192,9 @@ function limpiarFiltros() {
 }
 
 function llenarDetalle(guia) {
-  document.getElementById("detalleGuiaIcono").textContent = guia.icono;
+  document
+    .getElementById("detalleGuiaIcono")
+    .replaceChildren(crearIconoMinecraft(guia.icono));
   document.getElementById("detalleGuiaTitulo").textContent = guia.titulo;
   document.getElementById("detalleGuiaResumen").textContent = guia.resumen;
   document.getElementById("detalleGuiaTema").textContent = guia.tema;

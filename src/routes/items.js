@@ -123,7 +123,7 @@ router.post(
       rareza: opcion(datos.rareza, "rareza", RAREZAS),
       version: texto(datos.version, "version", { min: 1, max: 20 }),
       stack_max: entero(datos.stack_max ?? 64, "stack_max", { min: 1, max: 64 }),
-      icono: texto(datos.icono ?? "🧱", "icono", { min: 1, max: 16 }),
+      icono: texto(datos.icono ?? "diamond", "icono", { min: 1, max: 64 }),
       destacado: booleano(datos.destacado)
     };
 

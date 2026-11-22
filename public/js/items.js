@@ -1,6 +1,7 @@
 import { solicitar } from "./api.js";
 import {
   claseRareza,
+  crearIconoMinecraft,
   crearTarjetaItem,
   limpiarAlerta,
   mostrarAlerta,
@@ -26,6 +27,7 @@ const rarezaItem = document.getElementById("rarezaItem");
 const versionItem = document.getElementById("versionItem");
 const stackItem = document.getElementById("stackItem");
 const iconoItem = document.getElementById("iconoItem");
+const vistaPreviaIcono = document.getElementById("vistaPreviaIcono");
 const obtencionItem = document.getElementById("obtencionItem");
 const descripcionItem = document.getElementById("descripcionItem");
 const destacadoItem = document.getElementById("destacadoItem");
@@ -95,7 +97,7 @@ async function cargarMeta() {
     selectCategoria,
     meta.categorias.map((categoria) => ({
       valor: categoria.categoria_id,
-      texto: `${categoria.icono} ${categoria.nombre} (${categoria.total_items})`
+      texto: `${categoria.nombre} (${categoria.total_items})`
     })),
     "Todas las categorías"
   );
@@ -116,7 +118,7 @@ async function cargarMeta() {
     categoriaItem,
     meta.categorias.map((categoria) => ({
       valor: categoria.categoria_id,
-      texto: `${categoria.icono} ${categoria.nombre}`
+      texto: categoria.nombre
     })),
     "Selecciona una categoría"
   );
@@ -194,9 +196,9 @@ function renderizarItems(items) {
     vacio.className = "empty-state";
 
     const icono = document.createElement("div");
-    icono.className = "fs-1 emoji";
-    icono.textContent = "🧱";
+    icono.className = "empty-icon";
     icono.setAttribute("aria-hidden", "true");
+    icono.append(crearIconoMinecraft("crafting_table"));
 
     const titulo = document.createElement("h3");
     titulo.className = "h5 mt-3";
@@ -272,10 +274,16 @@ function limpiarFiltros() {
 function llenarDetalle(item) {
   const visual = document.getElementById("detalleItemVisual");
   visual.className = `item-visual item-visual--${item.categoria_slug || "bloques"}`;
-  document.getElementById("detalleItemIcono").textContent = item.icono;
+  document
+    .getElementById("detalleItemIcono")
+    .replaceChildren(crearIconoMinecraft(item.icono));
 
-  document.getElementById("detalleItemCategoria").textContent =
-    `${item.categoria_icono} ${item.categoria}`;
+  document
+    .getElementById("detalleItemCategoria")
+    .replaceChildren(
+      crearIconoMinecraft(item.categoria_icono),
+      document.createTextNode(` ${item.categoria}`)
+    );
   document.getElementById("detalleItemNombre").textContent = item.nombre;
 
   const rareza = document.getElementById("detalleItemRareza");
@@ -337,12 +345,12 @@ btnLimpiar.addEventListener("click", limpiarFiltros);
 
 descripcionItem.addEventListener("input", actualizarContadorDescripcion);
 
-document.querySelectorAll("[data-icono]").forEach((boton) => {
-  boton.addEventListener("click", () => {
-    iconoItem.value = boton.dataset.icono;
-    iconoItem.focus();
-  });
-});
+function actualizarVistaPreviaIcono() {
+  vistaPreviaIcono.replaceChildren(crearIconoMinecraft(iconoItem.value));
+}
+
+iconoItem.addEventListener("change", actualizarVistaPreviaIcono);
+actualizarVistaPreviaIcono();
 
 formItem.addEventListener("submit", async (evento) => {
   evento.preventDefault();
@@ -361,7 +369,7 @@ formItem.addEventListener("submit", async (evento) => {
     rareza: rarezaItem.value,
     version: versionItem.value.trim(),
     stack_max: Number(stackItem.value),
-    icono: iconoItem.value.trim() || "🧱",
+    icono: iconoItem.value || "diamond",
     destacado: destacadoItem.checked
   };
 
@@ -378,6 +386,7 @@ formItem.addEventListener("submit", async (evento) => {
     formItem.reset();
     formItem.classList.remove("was-validated");
     actualizarContadorDescripcion();
+    actualizarVistaPreviaIcono();
 
     await cargarMeta();
     await cargarItems();

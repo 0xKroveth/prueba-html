@@ -31,6 +31,7 @@ estático con **Bootstrap 5**. Permite leer, filtrar e insertar datos reales des
 - **Contacto:** formulario que inserta mensajes en la tabla `mensajes_contacto`.
 - **404 personalizada**, navegación consistente, diseño responsive y accesibilidad básica.
 - Bootstrap 5.3.3 e iconos incluidos **localmente** (no depende de CDN).
+- Texturas reales de ítems, bloques y guías incluidas en `public/assets/minecraft`.
 - Consultas SQL **parametrizadas** y validación del lado del servidor.
 
 ## Tecnologías
@@ -61,6 +62,8 @@ estático con **Bootstrap 5**. Permite leer, filtrar e insertar datos reales des
 │   │   ├── items.js
 │   │   ├── guias.js
 │   │   └── contacto.js
+│   ├── assets/
+│   │   └── minecraft/        # Texturas PNG de ítems y bloques
 │   ├── vendor/               # Bootstrap, iconos y fuente local
 │   ├── index.html
 │   ├── items.html
@@ -127,7 +130,7 @@ SQL
 ## Importar el dump
 
 El archivo `database/dump.sql` contiene el esquema completo, índices, restricciones y datos de
-ejemplo (6 categorías, 20 ítems, 9 guías y 1 mensaje).
+ejemplo (6 categorías, 23 ítems, 9 guías y 1 mensaje).
 
 ```bash
 psql -U craftpedia_user -h localhost -d craftpedia -f database/dump.sql
@@ -238,7 +241,7 @@ curl -X POST http://localhost:3000/api/items \
     "rareza": "Poco común",
     "version": "1.21",
     "stack_max": 64,
-    "icono": "🟣",
+    "icono": "diamond",
     "destacado": false
   }'
 
@@ -320,4 +323,5 @@ Restricciones destacadas:
 ## Licencia
 
 Proyecto académico de uso educativo. Minecraft es una marca registrada de Mojang Studios; este sitio
-no está afiliado ni respaldado por Mojang.
+no está afiliado ni respaldado por Mojang. Las texturas de ítems y bloques incluidas en
+`public/assets/minecraft` pertenecen a Mojang Studios y se usan únicamente con fines educativos.

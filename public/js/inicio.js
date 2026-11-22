@@ -1,5 +1,6 @@
 import { solicitar } from "./api.js";
 import {
+  crearIconoMinecraft,
   crearTarjetaGuia,
   crearTarjetaItem,
   limpiarAlerta,
@@ -48,8 +49,8 @@ async function cargarCategorias() {
 
       const icono = document.createElement("span");
       icono.className = "categoria-icon";
-      icono.textContent = categoria.icono;
       icono.setAttribute("aria-hidden", "true");
+      icono.append(crearIconoMinecraft(categoria.icono));
 
       const titulo = document.createElement("h3");
       titulo.className = "h6 mb-1";

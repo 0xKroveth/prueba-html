@@ -139,20 +139,98 @@ body {
 }
 
 /* Los emojis usan la fuente local incluida para verse igual en cualquier sistema. */
-.emoji,
-.stat-icon,
-.categoria-icon,
-.panel-icon,
-.hotbar-slot,
-.item-visual span,
-.guia-icon,
-.feature-icon,
-.contacto-info-card .icono,
-.empty-state .fs-1,
-.badge-categoria,
-[data-icono],
-#iconoItem {
+.emoji {
   font-family: "Noto Color Emoji", "Segoe UI", sans-serif;
+}
+
+/* Texturas reales de Minecraft, incluidas localmente en /assets/minecraft. */
+.icono-minecraft {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  vertical-align: middle;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  filter: drop-shadow(0 2px 0 rgba(31, 43, 26, 0.18));
+}
+
+.hotbar-slot .icono-minecraft {
+  width: 28px;
+  height: 28px;
+}
+
+.panel-icon .icono-minecraft {
+  width: 22px;
+  height: 22px;
+}
+
+.stat-icon .icono-minecraft {
+  width: 28px;
+  height: 28px;
+}
+
+.categoria-icon .icono-minecraft {
+  width: 34px;
+  height: 34px;
+}
+
+.item-visual > .icono-minecraft,
+.item-visual span .icono-minecraft {
+  width: 64px;
+  height: 64px;
+}
+
+.guia-icon .icono-minecraft {
+  width: 38px;
+  height: 38px;
+}
+
+.feature-icon .icono-minecraft {
+  width: 34px;
+  height: 34px;
+}
+
+.feature-icon .bi {
+  font-size: 1.7rem;
+  line-height: 1;
+}
+
+.contacto-info-card .icono .icono-minecraft {
+  width: 28px;
+  height: 28px;
+}
+
+.badge-categoria .icono-minecraft {
+  width: 17px;
+  height: 17px;
+  margin-right: 4px;
+  filter: none;
+}
+
+.empty-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.empty-icon .icono-minecraft {
+  width: 56px;
+  height: 56px;
+}
+
+.icono-preview {
+  display: inline-grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  background: #edf7df;
+  border: 2px solid var(--cp-border);
+}
+
+.icono-preview .icono-minecraft {
+  width: 42px;
+  height: 42px;
 }
 
 h1,
