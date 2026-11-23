@@ -1,8 +1,9 @@
 // servidor principal de craftpedia
 
-require("dotenv").config();
-
 const path = require("path");
+
+// leo el .env de la carpeta backend
+require("dotenv").config({ path: path.join(__dirname, ".env") });
 const express = require("express");
 
 const { pool, probarConexion } = require("./db");
@@ -14,7 +15,7 @@ const estadisticasRouter = require("./routes/estadisticas");
 
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
-const RUTA_PUBLICA = path.join(__dirname, "..", "public");
+const RUTA_PUBLICA = path.join(__dirname, "..", "frontend");
 
 // origenes que pueden hacer peticiones a la api
 const origenesPermitidos = new Set(

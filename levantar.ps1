@@ -30,7 +30,7 @@ function Fallar($texto) {
 
 # lee una variable del .env
 function Leer-Env($nombre, $porDefecto) {
-  $linea = Get-Content .env | Where-Object { $_ -match "^$nombre=" } | Select-Object -Last 1
+  $linea = Get-Content backend/.env | Where-Object { $_ -match "^$nombre=" } | Select-Object -Last 1
   if (-not $linea) { return $porDefecto }
   $valor = ($linea -split "=", 2)[1].Trim().Trim('"')
   if ($valor -eq "") { return $porDefecto }
@@ -67,19 +67,19 @@ Write-Host "Node.js $(node -v), $(& $psql --version)"
 # 2. archivo .env
 Paso "Configurando .env"
 
-if (-not (Test-Path .env)) {
-  Copy-Item .env.example .env
-  Write-Host "Se creó .env a partir de .env.example."
+if (-not (Test-Path backend/.env)) {
+  Copy-Item backend/.env.example backend/.env
+  Write-Host "Se creó backend/.env a partir de .env.example."
 }
 
 $claveActual = Leer-Env "DB_PASSWORD" ""
 if ($claveActual -eq "" -or $claveActual -eq "cambia_esta_clave") {
   $clave = [guid]::NewGuid().ToString("N").Substring(0, 20)
-  $rutaEnv = Join-Path $PSScriptRoot ".env"
+  $rutaEnv = Join-Path $PSScriptRoot "backend/.env"
   $contenido = [IO.File]::ReadAllText($rutaEnv)
   $contenido = [regex]::Replace($contenido, "(?m)^DB_PASSWORD=.*$", "DB_PASSWORD=$clave")
   [IO.File]::WriteAllText($rutaEnv, $contenido, (New-Object System.Text.UTF8Encoding($false)))
-  Write-Host "Se generó una clave aleatoria para la base de datos en .env."
+  Write-Host "Se generó una clave aleatoria para la base de datos en backend/.env."
 }
 
 $DB_HOST = Leer-Env "DB_HOST" "localhost"
@@ -175,7 +175,7 @@ Write-Host "Usuario $DB_USER y base $DB_DATABASE listos."
 Paso "Cargando datos"
 
 $tieneTablas = App-Psql @("-tAc", "SELECT to_regclass('public.items') IS NOT NULL")
-if ($LASTEXITCODE -ne 0) { Fallar "No se pudo entrar a la base con el usuario $DB_USER. Revisa DB_PASSWORD en .env." }
+if ($LASTEXITCODE -ne 0) { Fallar "No se pudo entrar a la base con el usuario $DB_USER. Revisa DB_PASSWORD en backend/.env." }
 
 if ("$tieneTablas".Trim() -eq "t") {
   Write-Host "La base ya tiene datos, no se vuelve a cargar (usa -Reiniciar para recargarla)."
@@ -190,6 +190,9 @@ App-Psql @("-tAc", "SELECT 'items: ' || (SELECT count(*) FROM items) || ', guias
 # 6. dependencias
 Paso "Instalando dependencias"
 
+# node y sus dependencias viven en backend
+Set-Location -Path (Join-Path $PSScriptRoot "backend")
+
 $marca = "node_modules/.package-lock.json"
 if ((Test-Path $marca) -and ((Get-Item -Force $marca).LastWriteTime -gt (Get-Item package-lock.json).LastWriteTime)) {
   Write-Host "Las dependencias ya están instaladas."
@@ -200,7 +203,7 @@ if ((Test-Path $marca) -and ((Get-Item -Force $marca).LastWriteTime -gt (Get-Ite
 
 # 7. servidor
 if ($SinIniciar) {
-  Paso "Listo. Inicia la web con: npm start"
+  Paso "Listo. Inicia la web con: cd backend; npm start"
   exit 0
 }
 

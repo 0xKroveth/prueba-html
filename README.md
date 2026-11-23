@@ -15,7 +15,7 @@ datos en PostgreSQL desde la web.
 
 Requisitos: Node.js 18 o superior y PostgreSQL 14 o superior instalados.
 
-Los scripts revisan los requisitos, crean `.env` con una clave aleatoria, crean el usuario y la base de
+Los scripts revisan los requisitos, crean `backend/.env` con una clave aleatoria, crean el usuario y la base de
 datos, cargan el dump, instalan las dependencias e inician la web en <http://localhost:3000>.
 Se pueden ejecutar varias veces: si la base ya tiene datos, no la vuelven a cargar.
 
@@ -46,8 +46,9 @@ Requisitos: Node.js 18 o superior y PostgreSQL 14 o superior.
 
    ```bash
    git clone https://github.com/0xKroveth/prueba-html.git
-   cd prueba-html
+   cd prueba-html/backend
    npm install
+   cd ..
    ```
 
 2. Crear el usuario y la base de datos (la clave la eliges tú):
@@ -63,23 +64,24 @@ Requisitos: Node.js 18 o superior y PostgreSQL 14 o superior.
    psql -h localhost -U craftpedia_user -d craftpedia -f database/dump.sql
    ```
 
-4. Copiar la configuración y escribir la clave en `DB_PASSWORD`:
+4. Copiar la configuración y escribir la clave en `DB_PASSWORD` de `backend/.env`:
 
    ```bash
-   cp .env.example .env
+   cp backend/.env.example backend/.env
    ```
 
 5. Iniciar el servidor y abrir <http://localhost:3000>:
 
    ```bash
+   cd backend
    npm start
    ```
 
 ## Estructura
 
 ```text
-database/   dump de la base de datos
+frontend/   páginas HTML, estilos, JavaScript, Bootstrap e imágenes
+backend/    servidor Node.js con Express, rutas de la API y package.json
+database/   dump de PostgreSQL
 levantar.*  scripts de instalación (Linux y Windows)
-public/     páginas, estilos, JavaScript e imágenes
-src/        servidor Express y rutas de la API
 ```

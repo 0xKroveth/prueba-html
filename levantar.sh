@@ -42,7 +42,7 @@ error() {
 # lee una variable del .env (sin ejecutar el archivo)
 leer_env() {
   local valor
-  valor=$(grep -E "^$1=" .env | tail -n 1 | cut -d= -f2- | tr -d '\r') || true
+  valor=$(grep -E "^$1=" backend/.env | tail -n 1 | cut -d= -f2- | tr -d '\r') || true
   valor="${valor%\"}"
   valor="${valor#\"}"
   echo "${valor:-$2}"
@@ -63,15 +63,15 @@ echo "Node.js $(node -v), $(psql --version)"
 # 2. archivo .env
 paso "Configurando .env"
 
-if [ ! -f .env ]; then
-  cp .env.example .env
-  echo "Se creó .env a partir de .env.example."
+if [ ! -f backend/.env ]; then
+  cp backend/.env.example backend/.env
+  echo "Se creó backend/.env a partir de .env.example."
 fi
 
 if [ "$(leer_env DB_PASSWORD '')" = "" ] || [ "$(leer_env DB_PASSWORD '')" = "cambia_esta_clave" ]; then
   CLAVE=$(LC_ALL=C tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 20 || true)
-  sed -i "s/^DB_PASSWORD=.*/DB_PASSWORD=$CLAVE/" .env
-  echo "Se generó una clave aleatoria para la base de datos en .env."
+  sed -i "s/^DB_PASSWORD=.*/DB_PASSWORD=$CLAVE/" backend/.env
+  echo "Se generó una clave aleatoria para la base de datos en backend/.env."
 fi
 
 DB_HOST=$(leer_env DB_HOST localhost)
@@ -143,7 +143,7 @@ echo "Usuario $DB_USER y base $DB_DATABASE listos."
 paso "Cargando datos"
 
 TIENE_TABLAS=$(app_psql -tAc "SELECT to_regclass('public.items') IS NOT NULL") ||
-  error "No se pudo entrar a la base con el usuario $DB_USER. Revisa DB_PASSWORD en .env."
+  error "No se pudo entrar a la base con el usuario $DB_USER. Revisa DB_PASSWORD en backend/.env."
 
 if [ "$TIENE_TABLAS" = "t" ]; then
   echo "La base ya tiene datos, no se vuelve a cargar (usa --reiniciar para recargarla)."
@@ -157,6 +157,9 @@ app_psql -tAc "SELECT 'items: ' || (SELECT count(*) FROM items) || ', guías: ' 
 # 6. dependencias
 paso "Instalando dependencias"
 
+# node y sus dependencias viven en backend
+cd backend
+
 if [ -f node_modules/.package-lock.json ] && [ node_modules/.package-lock.json -nt package-lock.json ]; then
   echo "Las dependencias ya están instaladas."
 else
@@ -165,7 +168,7 @@ fi
 
 # 7. servidor
 if [ "$INICIAR" -eq 0 ]; then
-  paso "Listo. Inicia la web con: npm start"
+  paso "Listo. Inicia la web con: cd backend && npm start"
   exit 0
 fi
 
