@@ -438,6 +438,15 @@ if (document.getElementById("formFiltros")) {
       document.getElementById("modalDetalleItem")
     );
 
+    // formulario para agregar
+    var formItem = document.getElementById("formItem");
+    var iconoItem = document.getElementById("iconoItem");
+    var descripcionItem = document.getElementById("descripcionItem");
+    var alertaFormularioItem = document.getElementById("alertaFormularioItem");
+    var btnGuardarItem = document.getElementById("btnGuardarItem");
+    var elementoModalAgregar = document.getElementById("modalAgregarItem");
+    var modalAgregarItem = bootstrap.Modal.getOrCreateInstance(elementoModalAgregar);
+
     var parametrosIniciales = new URLSearchParams(window.location.search);
     var meta = { categorias: [], versiones: [], rarezas: [] };
     var peticionActual = 0;
@@ -493,6 +502,19 @@ if (document.getElementById("formFiltros")) {
       llenarSelect(selectVersion,
         meta.versiones.map(function (v) { return { valor: v, texto: "Versión " + v }; }),
         "Todas las versiones"
+      );
+
+      // selects del formulario para agregar
+      llenarSelect(document.getElementById("categoriaItem"),
+        meta.categorias.map(function (c) { return { valor: c.categoria_id, texto: c.nombre }; }),
+        "Selecciona una categoría"
+      );
+      llenarSelect(document.getElementById("rarezaItem"),
+        meta.rarezas.map(function (r) { return { valor: r, texto: r }; }),
+        "Selecciona una rareza"
+      );
+      document.getElementById("listaVersiones").replaceChildren(
+        ...meta.versiones.map(function (v) { return new Option(v, v); })
       );
     }
 
@@ -604,7 +626,7 @@ if (document.getElementById("formFiltros")) {
     function limpiarFiltros() {
       formFiltros.reset();
       selectOrden.value = "nombre";
-      cargarItems();
+      return cargarItems();
     }
 
     // lleno el modal con datos del item
@@ -639,7 +661,67 @@ if (document.getElementById("formFiltros")) {
       }
     }
 
+    // muestra el icono elegido y cuenta los caracteres
+    function actualizarFormulario() {
+      document.getElementById("vistaPreviaIcono").replaceChildren(crearIconoMinecraft(iconoItem.value));
+      document.getElementById("contadorDescripcionItem").textContent = descripcionItem.value.length;
+    }
+
+    // bloquea el boton mientras se guarda
+    function bloquearFormulario(bloqueado) {
+      btnGuardarItem.disabled = bloqueado;
+      document.getElementById("spinnerGuardarItem").classList.toggle("d-none", !bloqueado);
+      document.getElementById("textoGuardarItem").textContent = bloqueado ? "Guardando…" : "Guardar ítem";
+    }
+
+    // envio el item nuevo al backend
+    async function guardarItem(e) {
+      e.preventDefault();
+      formItem.classList.add("was-validated");
+      if (!formItem.checkValidity()) return;
+
+      var campos = new FormData(formItem);
+      var datos = {
+        nombre: campos.get("nombre").trim(),
+        descripcion: campos.get("descripcion").trim(),
+        obtencion: campos.get("obtencion").trim(),
+        categoria_id: Number(campos.get("categoria_id")),
+        rareza: campos.get("rareza"),
+        version: campos.get("version").trim(),
+        stack_max: Number(campos.get("stack_max")),
+        icono: campos.get("icono"),
+        destacado: campos.has("destacado")
+      };
+
+      bloquearFormulario(true);
+      limpiarAlerta(alertaFormularioItem);
+
+      var respuesta;
+      try {
+        respuesta = await solicitar("/items", { method: "POST", body: JSON.stringify(datos) });
+      } catch (error) {
+        mostrarAlerta(alertaFormularioItem, "danger", error.message);
+        return;
+      } finally {
+        bloquearFormulario(false);
+      }
+
+      modalAgregarItem.hide();
+      formItem.reset();
+      formItem.classList.remove("was-validated");
+      actualizarFormulario();
+
+      // recargo todo para que se vea el item nuevo
+      try { await cargarMeta(); } catch (error) { mostrarAlerta(alertaItems, "danger", error.message); }
+      await limpiarFiltros();
+      mostrarAlerta(alertaItems, "success", 'Se agregó "' + respuesta.item.nombre + '" a la enciclopedia.');
+    }
+
     // eventos
+    formItem.addEventListener("submit", guardarItem);
+    iconoItem.addEventListener("change", actualizarFormulario);
+    descripcionItem.addEventListener("input", actualizarFormulario);
+    elementoModalAgregar.addEventListener("hidden.bs.modal", function () { limpiarAlerta(alertaFormularioItem); });
     formFiltros.addEventListener("submit", function (e) { e.preventDefault(); cargarItems(); });
     inputBuscar.addEventListener("input", function () {
       clearTimeout(temporizadorBusqueda);
@@ -653,6 +735,7 @@ if (document.getElementById("formFiltros")) {
 
     // inicio
     (async function () {
+      actualizarFormulario();
       mostrarEsqueletos(contenedorItems, 6, "330px");
       try { await cargarMeta(); } catch (e) { mostrarAlerta(alertaItems, "danger", e.message); }
       aplicarParametrosIniciales();

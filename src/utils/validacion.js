@@ -44,36 +44,6 @@ function entero(valor, campo, { min = 0, max = Number.MAX_SAFE_INTEGER, obligato
   return numero;
 }
 
-// valida un numero decimal y lo redondea a 2 decimales
-function decimal(valor, campo, { min = 0, max = Number.MAX_SAFE_INTEGER, obligatorio = true } = {}) {
-  if (valor === undefined || valor === null || valor === "") {
-    if (!obligatorio) return null;
-    throw new ErrorHttp(400, `El campo "${campo}" es obligatorio.`);
-  }
-
-  const numero = Number(String(valor).replace(",", "."));
-
-  if (!Number.isFinite(numero) || numero < min || numero > max) {
-    throw new ErrorHttp(
-      400,
-      `El campo "${campo}" debe ser un número entre ${min} y ${max}.`
-    );
-  }
-
-  return Math.round(numero * 100) / 100;
-}
-
-// valida un correo basico
-function correo(valor, campo = "email") {
-  const limpio = texto(valor, campo, { min: 5, max: 120 });
-
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(limpio)) {
-    throw new ErrorHttp(400, `El campo "${campo}" no tiene un formato válido.`);
-  }
-
-  return limpio.toLowerCase();
-}
-
 // valida que el valor este en la lista de opciones permitidas
 function opcion(valor, campo, permitidos) {
   const limpio = texto(valor, campo, { min: 1, max: 40 });
@@ -93,4 +63,4 @@ function booleano(valor) {
   return valor === true || valor === 1 || valor === "1" || valor === "true" || valor === "on";
 }
 
-module.exports = { texto, entero, decimal, correo, opcion, booleano };
+module.exports = { texto, entero, opcion, booleano };

@@ -65,6 +65,16 @@
                 versión y cuántos caben en un stack.
               </p>
             </div>
+            <div class="col-lg-4 text-lg-end">
+              <button
+                type="button"
+                class="btn btn-cp-gold btn-lg"
+                data-bs-toggle="modal"
+                data-bs-target="#modalAgregarItem"
+              >
+                <i class="bi bi-plus-lg me-2" aria-hidden="true"></i>Agregar ítem
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -192,6 +202,151 @@
           <div class="modal-footer justify-content-end">
             <button type="button" class="btn btn-cp-outline" data-bs-dismiss="modal">Cerrar</button>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para agregar un item -->
+    <div class="modal fade" id="modalAgregarItem" tabindex="-1" aria-labelledby="tituloModalAgregar" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+          <form id="formItem" novalidate>
+            <div class="modal-header">
+              <div>
+                <h2 class="modal-title h5" id="tituloModalAgregar">Agregar un ítem</h2>
+                <p class="small text-muted-cp mb-0">Se guardará en PostgreSQL y aparecerá en el catálogo.</p>
+              </div>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+              <div id="alertaFormularioItem" aria-live="polite"></div>
+
+              <div class="row g-3">
+                <div class="col-md-8">
+                  <label class="form-label" for="nombreItem">Nombre *</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="nombreItem"
+                    name="nombre"
+                    minlength="2"
+                    maxlength="100"
+                    placeholder="Ej: Bloque de amatista"
+                    required
+                  />
+                  <div class="invalid-feedback">Escribe un nombre de entre 2 y 100 caracteres.</div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label" for="iconoItem">Icono *</label>
+                  <select class="form-select" id="iconoItem" name="icono" required>
+                    <option value="diamond">Diamante</option>
+                    <option value="diamond_pickaxe">Pico de diamante</option>
+                    <option value="netherite_sword">Espada de netherita</option>
+                    <option value="diamond_chestplate">Pechera de diamante</option>
+                    <option value="golden_apple">Manzana dorada</option>
+                    <option value="bread">Pan</option>
+                    <option value="redstone">Redstone</option>
+                    <option value="grass_block">Bloque de hierba</option>
+                    <option value="iron_block">Bloque de hierro</option>
+                    <option value="elytra">Elytra</option>
+                    <option value="emerald">Esmeralda</option>
+                  </select>
+                  <div class="icono-preview mt-2" id="vistaPreviaIcono" aria-hidden="true"></div>
+                  <div class="invalid-feedback">Selecciona un icono.</div>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label" for="categoriaItem">Categoría *</label>
+                  <select class="form-select" id="categoriaItem" name="categoria_id" required></select>
+                  <div class="invalid-feedback">Selecciona una categoría.</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="rarezaItem">Rareza *</label>
+                  <select class="form-select" id="rarezaItem" name="rareza" required></select>
+                  <div class="invalid-feedback">Selecciona una rareza.</div>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label" for="versionItem">Versión *</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="versionItem"
+                    name="version"
+                    list="listaVersiones"
+                    maxlength="20"
+                    placeholder="1.21"
+                    required
+                  />
+                  <datalist id="listaVersiones"></datalist>
+                  <div class="invalid-feedback">Indica la versión, por ejemplo 1.21.</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="stackItem">Stack máximo *</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="stackItem"
+                    name="stack_max"
+                    value="64"
+                    min="1"
+                    max="64"
+                    required
+                  />
+                  <div class="invalid-feedback">Debe ser un número entre 1 y 64.</div>
+                </div>
+
+                <div class="col-12">
+                  <label class="form-label" for="obtencionItem">Cómo se obtiene *</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="obtencionItem"
+                    name="obtencion"
+                    minlength="5"
+                    maxlength="300"
+                    placeholder="Ej: Minando amatista en una geoda."
+                    required
+                  />
+                  <div class="invalid-feedback">Describe cómo se obtiene (5 a 300 caracteres).</div>
+                </div>
+
+                <div class="col-12">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <label class="form-label mb-0" for="descripcionItem">Descripción *</label>
+                    <span class="small text-muted-cp"><span id="contadorDescripcionItem">0</span>/500</span>
+                  </div>
+                  <textarea
+                    class="form-control mt-1"
+                    id="descripcionItem"
+                    name="descripcion"
+                    rows="3"
+                    minlength="10"
+                    maxlength="500"
+                    placeholder="Para qué sirve, dónde se usa y por qué es útil…"
+                    required
+                  ></textarea>
+                  <div class="invalid-feedback">Escribe una descripción de 10 a 500 caracteres.</div>
+                </div>
+
+                <div class="col-12">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="destacadoItem" name="destacado" />
+                    <label class="form-check-label" for="destacadoItem">
+                      Marcar como ítem destacado en la página de inicio
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-cp-outline" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-cp" id="btnGuardarItem">
+                <span class="spinner-border spinner-border-sm me-2 d-none" id="spinnerGuardarItem" aria-hidden="true"></span>
+                <span id="textoGuardarItem">Guardar ítem</span>
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
