@@ -95,8 +95,10 @@ Write-Host "Base: $DB_DATABASE en ${DB_HOST}:$DB_PORT (usuario $DB_USER)"
 Paso "Revisando PostgreSQL"
 
 function Postgres-Responde {
+  # los avisos de programas externos no deben cortar el script (powershell 5.1)
+  $ErrorActionPreference = "Continue"
   if (-not $pgIsReady) { return $true }
-  & $pgIsReady -h $DB_HOST -p $DB_PORT -q 2>$null | Out-Null
+  & $pgIsReady -h $DB_HOST -p $DB_PORT -q | Out-Null
   return ($LASTEXITCODE -eq 0)
 }
 
@@ -129,6 +131,8 @@ if (-not $adminPass) {
 
 # ejecuta un script sql como superusuario
 function Admin-Sql($sql, [string[]]$variables) {
+  # psql en windows avisa de la pagina de codigos, eso no es un error
+  $ErrorActionPreference = "Continue"
   $archivo = [IO.Path]::GetTempFileName()
   [IO.File]::WriteAllText($archivo, $sql, (New-Object System.Text.UTF8Encoding($false)))
   $env:PGPASSWORD = $adminPass
@@ -145,6 +149,7 @@ function Admin-Sql($sql, [string[]]$variables) {
 
 # ejecuta psql como el usuario de la aplicacion
 function App-Psql([string[]]$extra) {
+  $ErrorActionPreference = "Continue"
   $env:PGPASSWORD = $DB_PASSWORD
   try {
     & $psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d $DB_DATABASE -v ON_ERROR_STOP=1 -q @extra
@@ -191,6 +196,8 @@ App-Psql @("-tAc", "SELECT 'items: ' || (SELECT count(*) FROM items) || ', guias
 Paso "Instalando dependencias"
 
 # node y sus dependencias viven en backend
+# desde aqui solo corren programas externos, reviso su codigo de salida a mano
+$ErrorActionPreference = "Continue"
 Set-Location -Path (Join-Path $PSScriptRoot "backend")
 
 $marca = "node_modules/.package-lock.json"
