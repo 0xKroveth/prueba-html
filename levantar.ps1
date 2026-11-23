@@ -7,7 +7,7 @@
 #
 # O con doble clic en levantar.bat.
 #
-# Usa la clave "inf211" para el superusuario "postgres" (la que se pone al instalar PostgreSQL).
+# Usa la clave "admin" para el superusuario "postgres" (la que se pone al instalar PostgreSQL).
 # Si esa no sirve la pide. También se puede definir PG_ADMIN_PASSWORD (y PG_ADMIN_USER).
 
 param(
@@ -122,8 +122,8 @@ Write-Host "PostgreSQL responde en ${DB_HOST}:$DB_PORT."
 Paso "Creando usuario y base de datos (si no existen)"
 
 $adminUser = if ($env:PG_ADMIN_USER) { $env:PG_ADMIN_USER } else { "postgres" }
-# clave del proyecto: al instalar postgresql se pone "inf211" al usuario postgres
-$adminPass = if ($env:PG_ADMIN_PASSWORD) { $env:PG_ADMIN_PASSWORD } else { "inf211" }
+# clave del proyecto: al instalar postgresql se pone "admin" al usuario postgres
+$adminPass = if ($env:PG_ADMIN_PASSWORD) { $env:PG_ADMIN_PASSWORD } else { "admin" }
 
 # pruebo la clave, si no sirve se la pido al usuario
 function Clave-Sirve {
