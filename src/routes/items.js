@@ -53,6 +53,7 @@ router.get(
 router.get(
   "/",
   asyncHandler(async (req, res) => {
+    // leo y valido cada filtro que viene en la url (?buscar=...&rareza=...)
     const categoria = req.query.categoria
       ? entero(req.query.categoria, "categoria", { min: 1 })
       : null;
@@ -65,11 +66,19 @@ router.get(
     const version = req.query.version
       ? texto(req.query.version, "version", { min: 1, max: 20 })
       : null;
+    // si el filtro no viene queda en null y la consulta lo ignora
     const destacados = req.query.destacados === "true" ? true : null;
+    // el orden solo puede ser una clave de la lista fija de constantes.js,
+    // asi nunca entra texto del usuario directo al ORDER BY
     const orden = Object.hasOwn(ORDENES_ITEMS, req.query.orden)
       ? req.query.orden
       : "nombre";
 
+    // una sola consulta para todos los filtros:
+    // - "$1 IS NULL OR ..." hace que un filtro vacio no filtre nada
+    // - ILIKE '%texto%' busca el texto en cualquier parte, sin importar mayusculas
+    // - los valores van como parametros ($1, $2...) y no pegados al sql,
+    //   por eso no se puede hacer inyeccion sql
     const items = await consultar(
       `SELECT ${CAMPOS_ITEM}
        FROM items AS i
@@ -88,6 +97,7 @@ router.get(
       [categoria, buscar, rareza, version, destacados]
     );
 
+    // devuelvo el total para el contador y la lista de items
     res.json({ total: items.length, items });
   })
 );
@@ -96,6 +106,7 @@ router.get(
 router.get(
   "/:id",
   asyncHandler(async (req, res) => {
+    // el id tiene que ser un entero positivo, si no responde 400
     const itemId = entero(req.params.id, "id", { min: 1 });
     const item = await buscarPorId(itemId);
 
@@ -111,6 +122,7 @@ router.get(
 router.post(
   "/",
   asyncHandler(async (req, res) => {
+    // datos que manda el formulario en formato json
     const datos = req.body ?? {};
 
     // valido todos los campos
@@ -136,6 +148,7 @@ router.post(
       throw new ErrorHttp(400, "La categoría indicada no existe.");
     }
 
+    // inserto con parametros y pido de vuelta el id generado
     const insertados = await consultar(
       `INSERT INTO items
          (nombre, descripcion, obtencion, categoria_id, rareza, version, stack_max, icono, destacado)
@@ -157,6 +170,7 @@ router.post(
     // devuelvo el item completo con la categoria
     const item = await buscarPorId(insertados[0].item_id);
 
+    // 201 = recurso creado
     res.status(201).json({
       mensaje: "Ítem agregado correctamente a la enciclopedia.",
       item

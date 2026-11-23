@@ -13,6 +13,7 @@ function texto(valor, campo, { min = 1, max = 255, obligatorio = true } = {}) {
     throw new ErrorHttp(400, `El campo "${campo}" debe ser texto.`);
   }
 
+  // quito espacios al inicio y al final antes de medir el largo
   const limpio = valor.trim();
 
   if (limpio.length < min || limpio.length > max) {
@@ -32,6 +33,7 @@ function entero(valor, campo, { min = 0, max = Number.MAX_SAFE_INTEGER, obligato
     throw new ErrorHttp(400, `El campo "${campo}" es obligatorio.`);
   }
 
+  // Number("abc") da NaN y Number("2.5") no es entero, ambos se rechazan
   const numero = Number(valor);
 
   if (!Number.isInteger(numero) || numero < min || numero > max) {

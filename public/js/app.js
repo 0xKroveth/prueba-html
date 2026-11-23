@@ -10,6 +10,7 @@ var BASE_URL = "/api";
 async function solicitar(ruta, opciones) {
   opciones = opciones || {};
 
+  // si mando datos (POST) agrego el header de json
   var config = {
     ...opciones,
     headers: {
@@ -30,6 +31,7 @@ async function solicitar(ruta, opciones) {
   var tipo = respuesta.headers.get("content-type") || "";
   var datos = tipo.includes("application/json") ? await respuesta.json() : null;
 
+  // si el backend responde error (400, 404, 500...) uso su mensaje
   if (!respuesta.ok) {
     throw new Error(datos?.mensaje || "La solicitud falló con el código " + respuesta.status);
   }
@@ -55,6 +57,7 @@ var CLASES_DIFICULTAD = {
   "Avanzado": "dificultad--avanzado"
 };
 
+// devuelven la clase css segun la rareza o dificultad
 function claseRareza(rareza) {
   return CLASES_RAREZA[rareza] || "rareza--comun";
 }
@@ -114,7 +117,9 @@ function crearTarjetaItem(item, alVer) {
   cat.append(crearIconoMinecraft(item.categoria_icono), document.createTextNode(" " + item.categoria));
   visual.append(cat);
 
-  // cuerpo
+  // cuerpo de la tarjeta
+  // uso textContent y no innerHTML para que el texto de la bd
+  // no se interprete como html (evita xss)
   var cuerpo = document.createElement("div");
   cuerpo.className = "card-body d-flex flex-column";
 
@@ -150,6 +155,8 @@ function crearTarjetaItem(item, alVer) {
   ver.textContent = "v" + item.version;
   pie.append(ver);
 
+  // en la pagina de items el boton abre el modal,
+  // en el inicio es un link a la pagina de items
   if (typeof alVer === "function") {
     var btn = document.createElement("button");
     btn.type = "button";
@@ -230,6 +237,7 @@ function crearTarjetaGuia(guia, alVer) {
   textoMeta.textContent = guia.duracion + " · v" + guia.version;
   metaDiv.append(reloj, textoMeta);
 
+  // en la pagina de guias el boton abre el modal, en el inicio es un link
   if (typeof alVer === "function") {
     var btn = document.createElement("button");
     btn.type = "button";
@@ -251,7 +259,7 @@ function crearTarjetaGuia(guia, alVer) {
   return columna;
 }
 
-// muestra esqueletos de carga
+// muestra esqueletos de carga (bloques grises mientras llegan los datos)
 function mostrarEsqueletos(contenedor, cantidad, altura, claseCol) {
   cantidad = cantidad || 6;
   altura = altura || "320px";
@@ -288,14 +296,17 @@ function mostrarAlerta(contenedor, tipo, mensaje) {
   contenedor.append(alerta);
 }
 
+// borra la alerta que haya en el contenedor
 function limpiarAlerta(contenedor) {
   contenedor.replaceChildren();
 }
 
 // ============ PAGINA: INICIO ============
 
+// este bloque solo corre si estoy en index.html (existe contenedorCategorias)
 if (document.getElementById("contenedorCategorias")) {
   (function () {
+    // formato de numeros chileno (1.234)
     var numero = new Intl.NumberFormat("es-CL");
 
     var contenedorCategorias = document.getElementById("contenedorCategorias");
@@ -327,6 +338,7 @@ if (document.getElementById("contenedorCategorias")) {
         contenedorCategorias.replaceChildren();
         limpiarAlerta(alertaCategorias);
 
+        // armo todo en un fragmento y lo agrego de una vez al dom
         var frag = document.createDocumentFragment();
 
         resp.categorias.forEach(function (cat) {
@@ -335,6 +347,7 @@ if (document.getElementById("contenedorCategorias")) {
 
           var enlace = document.createElement("a");
           enlace.className = "categoria-card";
+          // al hacer clic abre items.html ya filtrado por esta categoria
           enlace.href = "/items.html?categoria=" + cat.categoria_id;
 
           var icono = document.createElement("span");
@@ -403,7 +416,7 @@ if (document.getElementById("contenedorCategorias")) {
       }
     }
 
-    // ejecuto todo
+    // ejecuto todo (las 4 peticiones van en paralelo)
     cargarEstadisticas();
     cargarCategorias();
     cargarItemsDestacados();
@@ -413,6 +426,7 @@ if (document.getElementById("contenedorCategorias")) {
 
 // ============ PAGINA: ITEMS ============
 
+// este bloque solo corre si estoy en items.html
 if (document.getElementById("formFiltros")) {
   (function () {
     var formFiltros = document.getElementById("formFiltros");
@@ -440,11 +454,15 @@ if (document.getElementById("formFiltros")) {
     var elementoModalAgregar = document.getElementById("modalAgregarItem");
     var modalAgregarItem = bootstrap.Modal.getOrCreateInstance(elementoModalAgregar);
 
+    // filtros que vienen en la url al abrir la pagina (ej: ?categoria=2)
     var parametrosIniciales = new URLSearchParams(window.location.search);
     var meta = { categorias: [], versiones: [], rarezas: [] };
+    // numero de la ultima peticion, sirve para ignorar respuestas viejas
     var peticionActual = 0;
+    // temporizador para esperar a que el usuario deje de escribir
     var temporizadorBusqueda;
 
+    // leo el valor actual de cada filtro del formulario
     function leerFiltros() {
       return {
         buscar: inputBuscar.value.trim(),
@@ -455,6 +473,8 @@ if (document.getElementById("formFiltros")) {
       };
     }
 
+    // guardo los filtros en la url sin recargar la pagina,
+    // asi se puede compartir el link o recargar sin perderlos
     function actualizarUrl(filtros) {
       var params = new URLSearchParams();
       if (filtros.buscar) params.set("buscar", filtros.buscar);
@@ -475,6 +495,7 @@ if (document.getElementById("formFiltros")) {
       opciones.forEach(function (op) {
         select.add(new Option(op.texto, String(op.valor)));
       });
+      // si ya habia algo elegido lo mantengo
       if (val && [...select.options].some(function (o) { return o.value === val; })) {
         select.value = val;
       }
@@ -523,6 +544,7 @@ if (document.getElementById("formFiltros")) {
       });
     }
 
+    // texto que dice que filtros estan activos
     function actualizarResumen(filtros) {
       var partes = [];
       if (filtros.buscar) partes.push('texto "' + filtros.buscar + '"');
@@ -540,6 +562,7 @@ if (document.getElementById("formFiltros")) {
         : "Mostrando toda la enciclopedia.";
     }
 
+    // dibujo las tarjetas de los items que llegaron
     function renderizarItems(items) {
       contenedorItems.replaceChildren();
 
@@ -582,9 +605,10 @@ if (document.getElementById("formFiltros")) {
       contenedorItems.append(frag);
     }
 
-    // pido items al backend
+    // pido items al backend con los filtros actuales (aqui se hace la busqueda)
     async function cargarItems() {
       var filtros = leerFiltros();
+      // le doy un numero a esta peticion
       var num = ++peticionActual;
 
       actualizarUrl(filtros);
@@ -594,6 +618,8 @@ if (document.getElementById("formFiltros")) {
       mostrarEsqueletos(contenedorItems, 6, "330px");
       limpiarAlerta(alertaItems);
 
+      // armo la url con los filtros, ej: /api/items?buscar=espada&rareza=Raro
+      // URLSearchParams codifica los espacios y caracteres especiales
       var params = new URLSearchParams();
       if (filtros.buscar) params.set("buscar", filtros.buscar);
       if (filtros.categoria) params.set("categoria", filtros.categoria);
@@ -603,6 +629,8 @@ if (document.getElementById("formFiltros")) {
 
       try {
         var datos = await solicitar("/items?" + params.toString());
+        // si mientras esperaba salio otra peticion mas nueva, ignoro esta
+        // (evita que una respuesta lenta pise los resultados mas recientes)
         if (num !== peticionActual) return;
         renderizarItems(datos.items);
         contadorResultados.textContent = datos.total + " ítem" + (datos.total === 1 ? "" : "s");
@@ -616,6 +644,7 @@ if (document.getElementById("formFiltros")) {
       }
     }
 
+    // vuelvo los filtros a su valor inicial y recargo
     function limpiarFiltros() {
       formFiltros.reset();
       selectOrden.value = "nombre";
@@ -644,6 +673,7 @@ if (document.getElementById("formFiltros")) {
       document.getElementById("detalleItemDestacado").classList.toggle("d-none", !item.destacado);
     }
 
+    // pido el item completo por su id y abro el modal de bootstrap
     async function abrirDetalle(itemRes) {
       try {
         var item = await solicitar("/items/" + itemRes.item_id);
@@ -669,10 +699,14 @@ if (document.getElementById("formFiltros")) {
 
     // envio el item nuevo al backend
     async function guardarItem(e) {
+      // evito que el formulario recargue la pagina
       e.preventDefault();
+      // was-validated muestra los errores de bootstrap en los campos
       formItem.classList.add("was-validated");
+      // si falta algun campo requerido no envio nada
       if (!formItem.checkValidity()) return;
 
+      // junto los datos del formulario en un objeto
       var campos = new FormData(formItem);
       var datos = {
         nombre: campos.get("nombre").trim(),
@@ -691,6 +725,7 @@ if (document.getElementById("formFiltros")) {
 
       var respuesta;
       try {
+        // envio el item como json al endpoint POST /api/items
         respuesta = await solicitar("/items", { method: "POST", body: JSON.stringify(datos) });
       } catch (error) {
         mostrarAlerta(alertaFormularioItem, "danger", error.message);
@@ -699,6 +734,7 @@ if (document.getElementById("formFiltros")) {
         bloquearFormulario(false);
       }
 
+      // si se guardo bien cierro el modal y limpio el formulario
       modalAgregarItem.hide();
       formItem.reset();
       formItem.classList.remove("was-validated");
@@ -716,17 +752,21 @@ if (document.getElementById("formFiltros")) {
     descripcionItem.addEventListener("input", actualizarFormulario);
     elementoModalAgregar.addEventListener("hidden.bs.modal", function () { limpiarAlerta(alertaFormularioItem); });
     formFiltros.addEventListener("submit", function (e) { e.preventDefault(); cargarItems(); });
+    // busqueda mientras se escribe: espero 350 ms despues de la ultima tecla
+    // para no hacer una peticion por cada letra
     inputBuscar.addEventListener("input", function () {
       clearTimeout(temporizadorBusqueda);
       temporizadorBusqueda = setTimeout(cargarItems, 350);
     });
+    // los selects filtran apenas cambian
     selectCategoria.addEventListener("change", cargarItems);
     selectRareza.addEventListener("change", cargarItems);
     selectVersion.addEventListener("change", cargarItems);
     selectOrden.addEventListener("change", cargarItems);
     btnLimpiar.addEventListener("click", limpiarFiltros);
 
-    // inicio
+    // inicio: primero lleno los selects, despues aplico los filtros de la url
+    // y al final cargo los items
     (async function () {
       actualizarFormulario();
       mostrarEsqueletos(contenedorItems, 6, "330px");
@@ -739,6 +779,8 @@ if (document.getElementById("formFiltros")) {
 
 // ============ PAGINA: GUIAS ============
 
+// este bloque solo corre si estoy en guias.html
+// funciona igual que la pagina de items
 if (document.getElementById("formFiltrosGuias")) {
   (function () {
     var formFiltros = document.getElementById("formFiltrosGuias");
@@ -756,11 +798,15 @@ if (document.getElementById("formFiltrosGuias")) {
       document.getElementById("modalDetalleGuia")
     );
 
+    // filtros que vienen en la url al abrir la pagina
     var parametrosIniciales = new URLSearchParams(window.location.search);
     var meta = { dificultades: [], temas: [] };
+    // numero de la ultima peticion, sirve para ignorar respuestas viejas
     var peticionActual = 0;
+    // temporizador para esperar a que el usuario deje de escribir
     var temporizadorBusqueda;
 
+    // llena un select con opciones (manteniendo lo elegido)
     function llenarSelect(select, opciones, textoInicial) {
       var val = select.value;
       select.replaceChildren();
@@ -771,12 +817,14 @@ if (document.getElementById("formFiltrosGuias")) {
       }
     }
 
+    // cargo las dificultades y temas para los selects
     async function cargarMeta() {
       meta = await solicitar("/meta");
       llenarSelect(selectDificultad, meta.dificultades, "Todas las dificultades");
       llenarSelect(selectTema, meta.temas, "Todos los temas");
     }
 
+    // aplico los filtros que venian en la url
     function aplicarParametrosIniciales() {
       inputBuscar.value = parametrosIniciales.get("buscar") || "";
       var d = parametrosIniciales.get("dificultad");
@@ -787,6 +835,7 @@ if (document.getElementById("formFiltrosGuias")) {
       if (o && [...selectOrden.options].some(function (op) { return op.value === o; })) selectOrden.value = o;
     }
 
+    // leo el valor actual de cada filtro
     function leerFiltros() {
       return {
         buscar: inputBuscar.value.trim(),
@@ -796,6 +845,7 @@ if (document.getElementById("formFiltrosGuias")) {
       };
     }
 
+    // guardo los filtros en la url sin recargar la pagina
     function actualizarUrl(filtros) {
       var params = new URLSearchParams();
       if (filtros.buscar) params.set("buscar", filtros.buscar);
@@ -806,6 +856,7 @@ if (document.getElementById("formFiltrosGuias")) {
       window.history.replaceState(null, "", window.location.pathname + (q ? "?" + q : ""));
     }
 
+    // texto que dice que filtros estan activos
     function actualizarResumen(filtros) {
       var partes = [];
       if (filtros.buscar) partes.push('texto "' + filtros.buscar + '"');
@@ -819,9 +870,11 @@ if (document.getElementById("formFiltrosGuias")) {
         : "Mostrando todas las guías.";
     }
 
+    // dibujo las tarjetas de las guias que llegaron
     function renderizarGuias(guias) {
       contenedorGuias.replaceChildren();
 
+      // si no hay resultados muestro un mensaje
       if (guias.length === 0) {
         var col = document.createElement("div");
         col.className = "col-12";
@@ -860,8 +913,10 @@ if (document.getElementById("formFiltrosGuias")) {
       contenedorGuias.append(frag);
     }
 
+    // pido las guias al backend con los filtros actuales (aqui se hace la busqueda)
     async function cargarGuias() {
       var filtros = leerFiltros();
+      // le doy un numero a esta peticion
       var num = ++peticionActual;
 
       actualizarUrl(filtros);
@@ -871,6 +926,7 @@ if (document.getElementById("formFiltrosGuias")) {
       mostrarEsqueletos(contenedorGuias, 4, "240px", "col-lg-6");
       limpiarAlerta(alertaGuias);
 
+      // armo la url con los filtros, ej: /api/guias?buscar=redstone&dificultad=Intermedio
       var params = new URLSearchParams();
       if (filtros.buscar) params.set("buscar", filtros.buscar);
       if (filtros.dificultad) params.set("dificultad", filtros.dificultad);
@@ -879,6 +935,7 @@ if (document.getElementById("formFiltrosGuias")) {
 
       try {
         var datos = await solicitar("/guias?" + params.toString());
+        // si salio otra peticion mas nueva mientras esperaba, ignoro esta
         if (num !== peticionActual) return;
         renderizarGuias(datos.guias);
         contadorGuias.textContent = datos.total + " guía" + (datos.total === 1 ? "" : "s");
@@ -892,6 +949,7 @@ if (document.getElementById("formFiltrosGuias")) {
       }
     }
 
+    // vuelvo los filtros a su valor inicial y recargo
     function limpiarFiltrosGuias() {
       formFiltros.reset();
       selectOrden.value = "titulo";
@@ -929,6 +987,7 @@ if (document.getElementById("formFiltrosGuias")) {
       });
     }
 
+    // pido la guia completa por su id y abro el modal de bootstrap
     async function abrirDetalle(guiaRes) {
       try {
         var guia = await solicitar("/guias/" + guiaRes.guia_id);
@@ -941,16 +1000,18 @@ if (document.getElementById("formFiltrosGuias")) {
 
     // eventos
     formFiltros.addEventListener("submit", function (e) { e.preventDefault(); cargarGuias(); });
+    // busqueda mientras se escribe: espero 350 ms despues de la ultima tecla
     inputBuscar.addEventListener("input", function () {
       clearTimeout(temporizadorBusqueda);
       temporizadorBusqueda = setTimeout(cargarGuias, 350);
     });
+    // los selects filtran apenas cambian
     selectDificultad.addEventListener("change", cargarGuias);
     selectTema.addEventListener("change", cargarGuias);
     selectOrden.addEventListener("change", cargarGuias);
     btnLimpiar.addEventListener("click", limpiarFiltrosGuias);
 
-    // inicio
+    // inicio: lleno los selects, aplico los filtros de la url y cargo las guias
     (async function () {
       mostrarEsqueletos(contenedorGuias, 4, "240px", "col-lg-6");
       try { await cargarMeta(); } catch (e) { mostrarAlerta(alertaGuias, "danger", e.message); }

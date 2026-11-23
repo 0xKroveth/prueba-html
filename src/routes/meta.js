@@ -22,6 +22,7 @@ router.get(
            c.slug,
            COUNT(i.item_id)::int AS total_items
          FROM categorias AS c
+         -- left join para que salgan tambien las categorias sin items
          LEFT JOIN items AS i ON i.categoria_id = c.categoria_id
          GROUP BY c.categoria_id
          ORDER BY c.categoria_id ASC`
@@ -30,6 +31,7 @@ router.get(
       consultar("SELECT DISTINCT tema FROM guias ORDER BY tema ASC")
     ]);
 
+    // las rarezas y dificultades son fijas, vienen de constantes.js
     res.json({
       categorias,
       versiones: versiones.map((fila) => fila.version),

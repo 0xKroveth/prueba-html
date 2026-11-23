@@ -10,6 +10,7 @@ const router = Router();
 router.get(
   "/",
   asyncHandler(async (_req, res) => {
+    // subconsultas para sacar todos los totales en una sola consulta
     const filas = await consultar(
       `SELECT
          (SELECT COUNT(*)::int FROM items) AS total_items,

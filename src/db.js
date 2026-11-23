@@ -10,6 +10,7 @@ const pool = new Pool({
   user: process.env.DB_USER || "demo_user",
   password: process.env.DB_PASSWORD,
   ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: false } : false,
+  // maximo de conexiones abiertas a la vez
   max: 10,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 5000
@@ -21,6 +22,7 @@ pool.on("error", (error) => {
 
 // ejecuta una consulta con parametros y devuelve las filas
 async function consultar(sql, parametros = []) {
+  // pg reemplaza $1, $2... por los parametros de forma segura
   const resultado = await pool.query(sql, parametros);
   return resultado.rows;
 }

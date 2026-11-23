@@ -36,6 +36,7 @@ router.get(
 router.get(
   "/",
   asyncHandler(async (req, res) => {
+    // leo y valido cada filtro que viene en la url (?buscar=...&dificultad=...)
     const buscar = req.query.buscar
       ? texto(req.query.buscar, "buscar", { min: 1, max: 80 })
       : null;
@@ -48,11 +49,17 @@ router.get(
     const version = req.query.version
       ? texto(req.query.version, "version", { min: 1, max: 20 })
       : null;
+    // si el filtro no viene queda en null y la consulta lo ignora
     const destacadas = req.query.destacadas === "true" ? true : null;
+    // el orden solo puede ser una clave de la lista fija de constantes.js,
+    // asi nunca entra texto del usuario directo al ORDER BY
     const orden = Object.hasOwn(ORDENES_GUIAS, req.query.orden)
       ? req.query.orden
       : "titulo";
 
+    // igual que en items: un filtro vacio (null) no filtra nada,
+    // ILIKE busca el texto en titulo, resumen y contenido,
+    // y los valores van como parametros para evitar inyeccion sql
     const guias = await consultar(
       `SELECT ${CAMPOS_GUIA}
        FROM guias AS g
@@ -78,6 +85,7 @@ router.get(
 router.get(
   "/:id",
   asyncHandler(async (req, res) => {
+    // el id tiene que ser un entero positivo, si no responde 400
     const guiaId = entero(req.params.id, "id", { min: 1 });
     const filas = await consultar(
       `SELECT ${CAMPOS_GUIA} FROM guias AS g WHERE g.guia_id = $1`,
