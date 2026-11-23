@@ -345,15 +345,10 @@ a {
   max-width: 38rem;
 }
 
-.hero-blocks {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 1;
-}
-
 .pixel-block {
   position: absolute;
+  z-index: 1;
+  pointer-events: none;
   width: 62px;
   height: 62px;
   border: 3px solid #111a0e;
@@ -488,7 +483,8 @@ a {
 
 /* Secciones */
 .section {
-  padding: 4.5rem 0;
+  padding-top: 4.5rem;
+  padding-bottom: 4.5rem;
 }
 
 .section-title {
@@ -957,6 +953,10 @@ a {
 }
 
 /* Utilidades */
+.texto-intro {
+  max-width: 44rem;
+}
+
 .text-muted-cp {
   color: var(--cp-muted);
 }
