@@ -7,8 +7,8 @@
 #
 # O con doble clic en levantar.bat.
 #
-# Pide la clave del superusuario "postgres" (la que se eligió al instalar PostgreSQL).
-# Para no escribirla, define PG_ADMIN_PASSWORD (y PG_ADMIN_USER si no es "postgres").
+# Usa la clave "inf211" para el superusuario "postgres" (la que se pone al instalar PostgreSQL).
+# Si esa no sirve la pide. También se puede definir PG_ADMIN_PASSWORD (y PG_ADMIN_USER).
 
 param(
   [switch]$Reiniciar,
@@ -122,9 +122,22 @@ Write-Host "PostgreSQL responde en ${DB_HOST}:$DB_PORT."
 Paso "Creando usuario y base de datos (si no existen)"
 
 $adminUser = if ($env:PG_ADMIN_USER) { $env:PG_ADMIN_USER } else { "postgres" }
-$adminPass = $env:PG_ADMIN_PASSWORD
-if (-not $adminPass) {
-  $segura = Read-Host "Clave del superusuario '$adminUser' de PostgreSQL" -AsSecureString
+# clave del proyecto: al instalar postgresql se pone "inf211" al usuario postgres
+$adminPass = if ($env:PG_ADMIN_PASSWORD) { $env:PG_ADMIN_PASSWORD } else { "inf211" }
+
+# pruebo la clave, si no sirve se la pido al usuario
+function Clave-Sirve {
+  $ErrorActionPreference = "Continue"
+  $env:PGPASSWORD = $adminPass
+  & $psql -h $DB_HOST -p $DB_PORT -U $adminUser -d postgres -tAc "SELECT 1" 2>&1 | Out-Null
+  $ok = ($LASTEXITCODE -eq 0)
+  Remove-Item Env:PGPASSWORD -ErrorAction SilentlyContinue
+  return $ok
+}
+
+if (-not (Clave-Sirve)) {
+  Aviso "La clave '$adminPass' no sirve para el usuario '$adminUser'."
+  $segura = Read-Host "Escribe la clave del superusuario '$adminUser' de PostgreSQL" -AsSecureString
   $adminPass = [Runtime.InteropServices.Marshal]::PtrToStringAuto(
     [Runtime.InteropServices.Marshal]::SecureStringToBSTR($segura))
 }

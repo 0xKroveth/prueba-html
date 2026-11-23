@@ -27,8 +27,8 @@ cd prueba-html
 ./levantar.sh
 ```
 
-**Windows:** doble clic en `levantar.bat`, o en PowerShell `.\levantar.ps1`. Pide la clave del
-usuario `postgres` que se eligió al instalar PostgreSQL.
+**Windows:** al instalar PostgreSQL usa la clave `inf211` para el usuario `postgres`. Después
+doble clic en `levantar.bat` (o en PowerShell `.\levantar.ps1`). Si la clave es otra, el script la pide.
 
 | Opción (Linux / Windows)         | Qué hace                                      |
 | -------------------------------- | --------------------------------------------- |
