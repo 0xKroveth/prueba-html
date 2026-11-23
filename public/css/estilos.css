@@ -667,6 +667,7 @@ a {
 }
 
 .item-visual {
+  margin: 0;
   position: relative;
   height: 140px;
   display: grid;
@@ -909,47 +910,12 @@ a {
   border: 2px solid var(--cp-border);
 }
 
-/* CTA */
 /* Footer */
 .footer {
   padding: 3.2rem 0 1.5rem;
   color: #b9c9ad;
   background: #141d10;
   border-top: 5px solid var(--cp-green);
-}
-
-.footer h5,
-.footer .navbar-brand {
-  color: #fff;
-}
-
-.footer a {
-  color: #b9c9ad;
-}
-
-.footer a:hover {
-  color: var(--cp-lime);
-}
-
-.footer .footer-bottom {
-  margin-top: 2.5rem;
-  padding-top: 1.2rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.14);
-  font-size: 0.84rem;
-}
-
-.social-link {
-  width: 38px;
-  height: 38px;
-  display: inline-grid;
-  place-items: center;
-  color: #fff;
-  border: 2px solid rgba(255, 255, 255, 0.25);
-}
-
-.social-link:hover {
-  color: var(--cp-lime);
-  background: rgba(255, 255, 255, 0.08);
 }
 
 /* Utilidades */
@@ -959,15 +925,6 @@ a {
 
 .text-muted-cp {
   color: var(--cp-muted);
-}
-
-.pixel-divider {
-  height: 5px;
-  background: repeating-linear-gradient(
-    90deg,
-    var(--cp-border) 0 10px,
-    transparent 10px 20px
-  );
 }
 
 :focus-visible {

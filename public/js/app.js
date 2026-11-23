@@ -292,13 +292,6 @@ function limpiarAlerta(contenedor) {
   contenedor.replaceChildren();
 }
 
-// ============ COMUN (todas las paginas) ============
-
-// activo tooltips de bootstrap
-document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
-  new bootstrap.Tooltip(el);
-});
-
 // ============ PAGINA: INICIO ============
 
 if (document.getElementById("contenedorCategorias")) {

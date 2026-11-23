@@ -1,17 +1,17 @@
 <!doctype html>
 <html lang="es">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta
       name="description"
       content="Guías de Minecraft paso a paso: supervivencia, minería, Nether, End, redstone y construcción. Datos leídos desde PostgreSQL."
-    />
+    >
     <title>Guías | CraftPedia</title>
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="/vendor/bootstrap-icons/bootstrap-icons.min.css" />
-    <link rel="stylesheet" href="/css/estilos.css" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/vendor/bootstrap-icons/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/css/estilos.css">
   </head>
   <body>
     <a class="skip-link" href="#contenido">Saltar al contenido principal</a>
@@ -58,108 +58,105 @@
             </ol>
           </nav>
           <div class="row align-items-end g-3">
-            <div class="col-lg-8">
+            <hgroup class="col-lg-8">
               <h1 class="mb-2">Guías paso a paso</h1>
               <p class="lead mb-0 text-white-50">
                 Desde tu primera noche hasta el dragón del End. Filtra por dificultad, tema o
                 versión y abre la guía completa.
               </p>
-            </div>
+            </hgroup>
           </div>
         </div>
       </header>
 
-      <section class="section">
-        <div class="container">
-          <div class="filtros-panel mb-4">
-            <form id="formFiltrosGuias" class="row g-3 align-items-end" novalidate>
-              <div class="col-lg-4">
-                <label class="form-label" for="buscarGuia">Buscar</label>
-                <div class="input-group">
-                  <span class="input-group-text bg-white border-end-0" aria-hidden="true">
-                    <i class="bi bi-search"></i>
-                  </span>
-                  <input
-                    type="search"
-                    class="form-control border-start-0"
-                    id="buscarGuia"
-                    name="buscar"
-                    placeholder="Diamantes, Nether, granja…"
-                    maxlength="80"
-                    autocomplete="off"
-                  />
-                </div>
-              </div>
-              <div class="col-sm-6 col-lg-2">
-                <label class="form-label" for="dificultadGuia">Dificultad</label>
-                <select class="form-select" id="dificultadGuia" name="dificultad"></select>
-              </div>
-              <div class="col-sm-6 col-lg-2">
-                <label class="form-label" for="temaGuia">Tema</label>
-                <select class="form-select" id="temaGuia" name="tema"></select>
-              </div>
-              <div class="col-sm-6 col-lg-2">
-                <label class="form-label" for="ordenGuia">Ordenar por</label>
-                <select class="form-select" id="ordenGuia" name="orden">
-                  <option value="titulo">Título (A–Z)</option>
-                  <option value="dificultad">Dificultad</option>
-                  <option value="recientes">Más recientes</option>
-                </select>
-              </div>
-              <div class="col-sm-6 col-lg-2 d-grid">
-                <button type="button" class="btn btn-cp-outline" id="btnLimpiarGuias">Limpiar</button>
-              </div>
-            </form>
-          </div>
-
-          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-            <p class="small text-muted-cp mb-0" id="resumenFiltrosGuias" aria-live="polite">
-              Mostrando todas las guías.
+      <section class="section container">
+        <h2 class="visually-hidden">Listado de guías</h2>
+        <aside class="filtros-panel mb-4" aria-label="Filtros">
+          <form id="formFiltrosGuias" class="row g-3 align-items-end" novalidate>
+            <p class="col-lg-4 mb-0">
+              <label class="form-label" for="buscarGuia">Buscar</label>
+              <span class="input-group">
+                <span class="input-group-text bg-white border-end-0" aria-hidden="true">
+                  <i class="bi bi-search"></i>
+                </span>
+                <input
+                  type="search"
+                  class="form-control border-start-0"
+                  id="buscarGuia"
+                  name="buscar"
+                  placeholder="Diamantes, Nether, granja…"
+                  maxlength="80"
+                  autocomplete="off"
+                >
+              </span>
             </p>
-            <p class="small mb-0"><strong id="contadorGuias">Cargando…</strong></p>
-          </div>
+            <p class="col-sm-6 col-lg-2 mb-0">
+              <label class="form-label" for="dificultadGuia">Dificultad</label>
+              <select class="form-select" id="dificultadGuia" name="dificultad"></select>
+            </p>
+            <p class="col-sm-6 col-lg-2 mb-0">
+              <label class="form-label" for="temaGuia">Tema</label>
+              <select class="form-select" id="temaGuia" name="tema"></select>
+            </p>
+            <p class="col-sm-6 col-lg-2 mb-0">
+              <label class="form-label" for="ordenGuia">Ordenar por</label>
+              <select class="form-select" id="ordenGuia" name="orden">
+                <option value="titulo">Título (A–Z)</option>
+                <option value="dificultad">Dificultad</option>
+                <option value="recientes">Más recientes</option>
+              </select>
+            </p>
+            <p class="col-sm-6 col-lg-2 d-grid mb-0">
+              <button type="button" class="btn btn-cp-outline" id="btnLimpiarGuias">Limpiar</button>
+            </p>
+          </form>
+        </aside>
 
-          <div id="alertaGuias" aria-live="polite"></div>
-          <div class="row g-4" id="listaGuias" aria-live="polite"></div>
-        </div>
+        <header class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+          <p class="small text-muted-cp mb-0" id="resumenFiltrosGuias" aria-live="polite">
+            Mostrando todas las guías.
+          </p>
+          <p class="small mb-0"><strong id="contadorGuias">Cargando…</strong></p>
+        </header>
+
+        <div id="alertaGuias" aria-live="polite"></div>
+        <div class="row g-4" id="listaGuias" aria-live="polite"></div>
       </section>
     </main>
 
-    <footer class="footer">
-      <div class="container text-center">
-        <p class="mb-1 fw-bold">CTF Estatal</p>
-        <p class="mb-0 small">Hecho por Matías Quiroz</p>
-      </div>
+    <footer class="footer text-center">
+      <p class="mb-1 fw-bold">CFT Estatal</p>
+      <p class="mb-0 small">Hecho por Matías Quiroz</p>
     </footer>
 
     <!-- Modal de guía -->
-    <div class="modal fade" id="modalDetalleGuia" tabindex="-1" aria-labelledby="detalleGuiaTitulo" aria-hidden="true">
+    <div class="modal fade" id="modalDetalleGuia" tabindex="-1" role="dialog" aria-labelledby="detalleGuiaTitulo" aria-hidden="true">
       <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content">
-          <div class="modal-header">
+        <article class="modal-content">
+          <header class="modal-header">
             <div class="d-flex align-items-center gap-3">
               <span class="guia-icon flex-shrink-0" id="detalleGuiaIcono" aria-hidden="true">
-                <img class="icono-minecraft" src="/assets/minecraft/book.png" alt="" />
+                <img class="icono-minecraft" src="/assets/minecraft/book.png" alt="">
               </span>
-              <div>
+              <hgroup>
                 <h2 class="modal-title h5 mb-1" id="detalleGuiaTitulo">Guía</h2>
-                <div class="d-flex flex-wrap gap-2">
+                <p class="d-flex flex-wrap gap-2 mb-0">
                   <span class="dificultad" id="detalleGuiaDificultad">Dificultad</span>
                   <span class="badge text-bg-light border" id="detalleGuiaTema">Tema</span>
-                </div>
-              </div>
+                </p>
+              </hgroup>
             </div>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-          </div>
+          </header>
           <div class="modal-body">
             <p class="text-secondary" id="detalleGuiaResumen"></p>
             <div class="guia-meta mb-3" id="detalleGuiaMeta"></div>
             <div class="guia-contenido" id="detalleGuiaContenido"></div>
           </div>
-          <div class="modal-footer justify-content-end">
+          <footer class="modal-footer justify-content-end">
             <button type="button" class="btn btn-cp-outline" data-bs-dismiss="modal">Cerrar</button>
-          </div>
-        </div>
+          </footer>
+        </article>
       </div>
     </div>
 

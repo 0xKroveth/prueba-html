@@ -1,17 +1,17 @@
 <!doctype html>
 <html lang="es">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta
       name="description"
       content="CraftPedia: enciclopedia fan de Minecraft con ítems, guías, filtros por rareza y versión. Proyecto conectado a PostgreSQL."
-    />
+    >
     <title>CraftPedia | Enciclopedia fan de Minecraft</title>
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="/vendor/bootstrap-icons/bootstrap-icons.min.css" />
-    <link rel="stylesheet" href="/css/estilos.css" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/vendor/bootstrap-icons/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/css/estilos.css">
   </head>
   <body>
     <a class="skip-link" href="#contenido">Saltar al contenido principal</a>
@@ -61,7 +61,7 @@
                 Enciclopedia de ítems y guías
               </span>
               <h1 class="text-balance mb-3">
-                Todo Minecraft,<br />bloque por bloque.
+                Todo Minecraft,<br>bloque por bloque.
               </h1>
               <p class="lead mb-4">
                 Explora ítems, conoce su rareza y descubre cómo conseguirlos. Aprende con guías
@@ -80,80 +80,81 @@
               </ul>
             </header>
             <aside class="col-lg-5">
-              <article class="hero-panel">
+              <figure class="hero-panel mb-0">
                 <p class="d-flex justify-content-between align-items-center mb-3">
                   <span class="small text-white-50">Hotbar del explorador</span>
                   <span class="badge text-bg-success">En línea</span>
                 </p>
                 <p class="hotbar" aria-hidden="true">
-                  <span class="hotbar-slot active"><img class="icono-minecraft" src="/assets/minecraft/diamond_pickaxe.png" alt="" /></span>
-                  <span class="hotbar-slot"><img class="icono-minecraft" src="/assets/minecraft/netherite_sword.png" alt="" /></span>
-                  <span class="hotbar-slot"><img class="icono-minecraft" src="/assets/minecraft/diamond_chestplate.png" alt="" /></span>
-                  <span class="hotbar-slot"><img class="icono-minecraft" src="/assets/minecraft/golden_apple.png" alt="" /></span>
-                  <span class="hotbar-slot"><img class="icono-minecraft" src="/assets/minecraft/grass_block.png" alt="" /></span>
+                  <span class="hotbar-slot active"><img class="icono-minecraft" src="/assets/minecraft/diamond_pickaxe.png" alt=""></span>
+                  <span class="hotbar-slot"><img class="icono-minecraft" src="/assets/minecraft/netherite_sword.png" alt=""></span>
+                  <span class="hotbar-slot"><img class="icono-minecraft" src="/assets/minecraft/diamond_chestplate.png" alt=""></span>
+                  <span class="hotbar-slot"><img class="icono-minecraft" src="/assets/minecraft/golden_apple.png" alt=""></span>
+                  <span class="hotbar-slot"><img class="icono-minecraft" src="/assets/minecraft/grass_block.png" alt=""></span>
                 </p>
                 <ul class="list-unstyled mb-0">
                   <li class="panel-row">
-                    <span class="panel-icon" aria-hidden="true"><img class="icono-minecraft" src="/assets/minecraft/diamond.png" alt="" /></span>
+                    <span class="panel-icon" aria-hidden="true"><img class="icono-minecraft" src="/assets/minecraft/diamond.png" alt=""></span>
                     <p class="mb-0">
                       <strong class="d-block">Diamantes y netherita</strong>
                       <span class="small text-white-50">El equipo que todo jugador busca</span>
                     </p>
                   </li>
                   <li class="panel-row">
-                    <span class="panel-icon" aria-hidden="true"><img class="icono-minecraft" src="/assets/minecraft/redstone.png" alt="" /></span>
+                    <span class="panel-icon" aria-hidden="true"><img class="icono-minecraft" src="/assets/minecraft/redstone.png" alt=""></span>
                     <p class="mb-0">
                       <strong class="d-block">Redstone y granjas</strong>
                       <span class="small text-white-50">Automatiza tu mundo</span>
                     </p>
                   </li>
                   <li class="panel-row">
-                    <span class="panel-icon" aria-hidden="true"><img class="icono-minecraft" src="/assets/minecraft/ender_eye.png" alt="" /></span>
+                    <span class="panel-icon" aria-hidden="true"><img class="icono-minecraft" src="/assets/minecraft/ender_eye.png" alt=""></span>
                     <p class="mb-0">
                       <strong class="d-block">Guía del End</strong>
                       <span class="small text-white-50">Derrota al dragón paso a paso</span>
                     </p>
                   </li>
                 </ul>
-                <p class="d-flex justify-content-between align-items-center mt-3 mb-0">
+                <figcaption class="d-flex justify-content-between align-items-center mt-3">
                   <span class="small text-white-50">Datos servidos desde PostgreSQL</span>
                   <i class="bi bi-database-check text-info" aria-hidden="true"></i>
-                </p>
-              </article>
+                </figcaption>
+              </figure>
             </aside>
           </div>
         </div>
       </section>
 
-      <section class="stats-band container" aria-label="Indicadores de la enciclopedia">
+      <section class="stats-band container">
+        <h2 class="visually-hidden">Indicadores de la enciclopedia</h2>
         <ul class="row g-3 list-unstyled mb-0">
           <li class="col-6 col-lg-3">
-            <article class="stat-card">
-              <span class="stat-icon" aria-hidden="true"><img class="icono-minecraft" src="/assets/minecraft/grass_block.png" alt="" /></span>
+            <figure class="stat-card mb-0">
+              <span class="stat-icon" aria-hidden="true"><img class="icono-minecraft" src="/assets/minecraft/grass_block.png" alt=""></span>
               <p class="stat-value mb-0" id="statItems">—</p>
-              <p class="stat-label mb-0">Ítems registrados</p>
-            </article>
+              <figcaption class="stat-label">Ítems registrados</figcaption>
+            </figure>
           </li>
           <li class="col-6 col-lg-3">
-            <article class="stat-card">
-              <span class="stat-icon" aria-hidden="true"><img class="icono-minecraft" src="/assets/minecraft/book.png" alt="" /></span>
+            <figure class="stat-card mb-0">
+              <span class="stat-icon" aria-hidden="true"><img class="icono-minecraft" src="/assets/minecraft/book.png" alt=""></span>
               <p class="stat-value mb-0" id="statGuias">—</p>
-              <p class="stat-label mb-0">Guías publicadas</p>
-            </article>
+              <figcaption class="stat-label">Guías publicadas</figcaption>
+            </figure>
           </li>
           <li class="col-6 col-lg-3">
-            <article class="stat-card">
-              <span class="stat-icon" aria-hidden="true"><img class="icono-minecraft" src="/assets/minecraft/bundle.png" alt="" /></span>
+            <figure class="stat-card mb-0">
+              <span class="stat-icon" aria-hidden="true"><img class="icono-minecraft" src="/assets/minecraft/bundle.png" alt=""></span>
               <p class="stat-value mb-0" id="statCategorias">—</p>
-              <p class="stat-label mb-0">Categorías</p>
-            </article>
+              <figcaption class="stat-label">Categorías</figcaption>
+            </figure>
           </li>
           <li class="col-6 col-lg-3">
-            <article class="stat-card">
-              <span class="stat-icon" aria-hidden="true"><img class="icono-minecraft" src="/assets/minecraft/name_tag.png" alt="" /></span>
+            <figure class="stat-card mb-0">
+              <span class="stat-icon" aria-hidden="true"><img class="icono-minecraft" src="/assets/minecraft/name_tag.png" alt=""></span>
               <p class="stat-value mb-0" id="statVersiones">—</p>
-              <p class="stat-label mb-0">Versiones cubiertas</p>
-            </article>
+              <figcaption class="stat-label">Versiones cubiertas</figcaption>
+            </figure>
           </li>
         </ul>
       </section>
@@ -243,7 +244,7 @@
     </main>
 
     <footer class="footer text-center">
-      <p class="mb-1 fw-bold">CTF Estatal</p>
+      <p class="mb-1 fw-bold">CFT Estatal</p>
       <p class="mb-0 small">Hecho por Matías Quiroz</p>
     </footer>
 
