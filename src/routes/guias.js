@@ -36,7 +36,7 @@ router.get(
 router.get(
   "/",
   asyncHandler(async (req, res) => {
-    // leo y valido cada filtro que viene en la url (?buscar=...&dificultad=...)
+    // leo y valido los filtros de la url
     const buscar = req.query.buscar
       ? texto(req.query.buscar, "buscar", { min: 1, max: 80 })
       : null;
@@ -51,15 +51,12 @@ router.get(
       : null;
     // si el filtro no viene queda en null y la consulta lo ignora
     const destacadas = req.query.destacadas === "true" ? true : null;
-    // el orden solo puede ser una clave de la lista fija de constantes.js,
-    // asi nunca entra texto del usuario directo al ORDER BY
+    // el orden solo puede ser uno de constantes.js
     const orden = Object.hasOwn(ORDENES_GUIAS, req.query.orden)
       ? req.query.orden
       : "titulo";
 
-    // igual que en items: un filtro vacio (null) no filtra nada,
-    // ILIKE busca el texto en titulo, resumen y contenido,
-    // y los valores van como parametros para evitar inyeccion sql
+    // igual que en items: busca en titulo, resumen y contenido
     const guias = await consultar(
       `SELECT ${CAMPOS_GUIA}
        FROM guias AS g

@@ -10,10 +10,10 @@ class ErrorHttp extends Error {
   }
 }
 
-// envuelve funciones async para que los errores lleguen al middleware de express
+// manda los errores async al manejador de express
 function asyncHandler(controlador) {
   return (req, res, next) => {
-    // si la funcion falla, paso el error a next() y lo responde el manejador de server.js
+    // si falla, el error va a next()
     Promise.resolve(controlador(req, res, next)).catch(next);
   };
 }

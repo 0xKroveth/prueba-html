@@ -53,7 +53,7 @@ router.get(
 router.get(
   "/",
   asyncHandler(async (req, res) => {
-    // leo y valido cada filtro que viene en la url (?buscar=...&rareza=...)
+    // leo y valido los filtros de la url
     const categoria = req.query.categoria
       ? entero(req.query.categoria, "categoria", { min: 1 })
       : null;
@@ -68,17 +68,14 @@ router.get(
       : null;
     // si el filtro no viene queda en null y la consulta lo ignora
     const destacados = req.query.destacados === "true" ? true : null;
-    // el orden solo puede ser una clave de la lista fija de constantes.js,
-    // asi nunca entra texto del usuario directo al ORDER BY
+    // el orden solo puede ser uno de constantes.js
     const orden = Object.hasOwn(ORDENES_ITEMS, req.query.orden)
       ? req.query.orden
       : "nombre";
 
-    // una sola consulta para todos los filtros:
-    // - "$1 IS NULL OR ..." hace que un filtro vacio no filtre nada
-    // - ILIKE '%texto%' busca el texto en cualquier parte, sin importar mayusculas
-    // - los valores van como parametros ($1, $2...) y no pegados al sql,
-    //   por eso no se puede hacer inyeccion sql
+    // la busqueda: si un filtro es null no filtra nada
+    // ILIKE busca el texto sin importar mayusculas
+    // los $1, $2... evitan inyeccion sql
     const items = await consultar(
       `SELECT ${CAMPOS_ITEM}
        FROM items AS i

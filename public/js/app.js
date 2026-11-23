@@ -6,7 +6,7 @@
 // url base de la api
 var BASE_URL = "/api";
 
-// funcion para hacer peticiones al backend
+// todas las peticiones a la api pasan por aqui
 async function solicitar(ruta, opciones) {
   opciones = opciones || {};
 
@@ -22,6 +22,7 @@ async function solicitar(ruta, opciones) {
   var respuesta;
 
   try {
+    // aqui sale la peticion al backend
     respuesta = await fetch(BASE_URL + ruta, config);
   } catch (e) {
     throw new Error("No fue posible comunicarse con el servidor. Verifica que el backend esté en ejecución.");
@@ -118,8 +119,7 @@ function crearTarjetaItem(item, alVer) {
   visual.append(cat);
 
   // cuerpo de la tarjeta
-  // uso textContent y no innerHTML para que el texto de la bd
-  // no se interprete como html (evita xss)
+  // textContent y no innerHTML, asi evito xss
   var cuerpo = document.createElement("div");
   cuerpo.className = "card-body d-flex flex-column";
 
@@ -155,8 +155,7 @@ function crearTarjetaItem(item, alVer) {
   ver.textContent = "v" + item.version;
   pie.append(ver);
 
-  // en la pagina de items el boton abre el modal,
-  // en el inicio es un link a la pagina de items
+  // en items abre el modal, en el inicio es un link
   if (typeof alVer === "function") {
     var btn = document.createElement("button");
     btn.type = "button";
@@ -303,7 +302,7 @@ function limpiarAlerta(contenedor) {
 
 // ============ PAGINA: INICIO ============
 
-// este bloque solo corre si estoy en index.html (existe contenedorCategorias)
+// solo corre en index.html
 if (document.getElementById("contenedorCategorias")) {
   (function () {
     // formato de numeros chileno (1.234)
@@ -473,8 +472,7 @@ if (document.getElementById("formFiltros")) {
       };
     }
 
-    // guardo los filtros en la url sin recargar la pagina,
-    // asi se puede compartir el link o recargar sin perderlos
+    // guardo los filtros en la url para no perderlos al recargar
     function actualizarUrl(filtros) {
       var params = new URLSearchParams();
       if (filtros.buscar) params.set("buscar", filtros.buscar);
@@ -605,7 +603,7 @@ if (document.getElementById("formFiltros")) {
       contenedorItems.append(frag);
     }
 
-    // pido items al backend con los filtros actuales (aqui se hace la busqueda)
+    // aqui se hace la busqueda de items
     async function cargarItems() {
       var filtros = leerFiltros();
       // le doy un numero a esta peticion
@@ -618,8 +616,7 @@ if (document.getElementById("formFiltros")) {
       mostrarEsqueletos(contenedorItems, 6, "330px");
       limpiarAlerta(alertaItems);
 
-      // armo la url con los filtros, ej: /api/items?buscar=espada&rareza=Raro
-      // URLSearchParams codifica los espacios y caracteres especiales
+      // armo la url, ej: /api/items?buscar=espada
       var params = new URLSearchParams();
       if (filtros.buscar) params.set("buscar", filtros.buscar);
       if (filtros.categoria) params.set("categoria", filtros.categoria);
@@ -629,8 +626,7 @@ if (document.getElementById("formFiltros")) {
 
       try {
         var datos = await solicitar("/items?" + params.toString());
-        // si mientras esperaba salio otra peticion mas nueva, ignoro esta
-        // (evita que una respuesta lenta pise los resultados mas recientes)
+        // si ya hay una busqueda mas nueva, ignoro esta
         if (num !== peticionActual) return;
         renderizarItems(datos.items);
         contadorResultados.textContent = datos.total + " ítem" + (datos.total === 1 ? "" : "s");
@@ -752,8 +748,7 @@ if (document.getElementById("formFiltros")) {
     descripcionItem.addEventListener("input", actualizarFormulario);
     elementoModalAgregar.addEventListener("hidden.bs.modal", function () { limpiarAlerta(alertaFormularioItem); });
     formFiltros.addEventListener("submit", function (e) { e.preventDefault(); cargarItems(); });
-    // busqueda mientras se escribe: espero 350 ms despues de la ultima tecla
-    // para no hacer una peticion por cada letra
+    // busca cuando dejas de escribir por 350 ms
     inputBuscar.addEventListener("input", function () {
       clearTimeout(temporizadorBusqueda);
       temporizadorBusqueda = setTimeout(cargarItems, 350);
@@ -765,8 +760,7 @@ if (document.getElementById("formFiltros")) {
     selectOrden.addEventListener("change", cargarItems);
     btnLimpiar.addEventListener("click", limpiarFiltros);
 
-    // inicio: primero lleno los selects, despues aplico los filtros de la url
-    // y al final cargo los items
+    // al abrir: selects, filtros de la url y despues los items
     (async function () {
       actualizarFormulario();
       mostrarEsqueletos(contenedorItems, 6, "330px");
@@ -779,8 +773,7 @@ if (document.getElementById("formFiltros")) {
 
 // ============ PAGINA: GUIAS ============
 
-// este bloque solo corre si estoy en guias.html
-// funciona igual que la pagina de items
+// solo corre en guias.html, igual que items
 if (document.getElementById("formFiltrosGuias")) {
   (function () {
     var formFiltros = document.getElementById("formFiltrosGuias");
@@ -913,7 +906,7 @@ if (document.getElementById("formFiltrosGuias")) {
       contenedorGuias.append(frag);
     }
 
-    // pido las guias al backend con los filtros actuales (aqui se hace la busqueda)
+    // aqui se hace la busqueda de guias
     async function cargarGuias() {
       var filtros = leerFiltros();
       // le doy un numero a esta peticion
@@ -926,7 +919,7 @@ if (document.getElementById("formFiltrosGuias")) {
       mostrarEsqueletos(contenedorGuias, 4, "240px", "col-lg-6");
       limpiarAlerta(alertaGuias);
 
-      // armo la url con los filtros, ej: /api/guias?buscar=redstone&dificultad=Intermedio
+      // armo la url, ej: /api/guias?buscar=redstone
       var params = new URLSearchParams();
       if (filtros.buscar) params.set("buscar", filtros.buscar);
       if (filtros.dificultad) params.set("dificultad", filtros.dificultad);
@@ -935,7 +928,7 @@ if (document.getElementById("formFiltrosGuias")) {
 
       try {
         var datos = await solicitar("/guias?" + params.toString());
-        // si salio otra peticion mas nueva mientras esperaba, ignoro esta
+        // si ya hay una busqueda mas nueva, ignoro esta
         if (num !== peticionActual) return;
         renderizarGuias(datos.guias);
         contadorGuias.textContent = datos.total + " guía" + (datos.total === 1 ? "" : "s");
@@ -1000,7 +993,7 @@ if (document.getElementById("formFiltrosGuias")) {
 
     // eventos
     formFiltros.addEventListener("submit", function (e) { e.preventDefault(); cargarGuias(); });
-    // busqueda mientras se escribe: espero 350 ms despues de la ultima tecla
+    // busca cuando dejas de escribir por 350 ms
     inputBuscar.addEventListener("input", function () {
       clearTimeout(temporizadorBusqueda);
       temporizadorBusqueda = setTimeout(cargarGuias, 350);
