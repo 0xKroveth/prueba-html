@@ -1,1015 +1,515 @@
-// app.js - toda la logica del frontend de craftpedia
-// se carga en todas las paginas
+// app.js - logica del frontend de craftpedia
+// se carga en las 3 paginas y cada parte revisa si esta en su pagina
 
-// ============ API ============
+// todas las rutas del backend empiezan con /api
+const API = "/api";
 
-// url base de la api
-var BASE_URL = "/api";
+// ============ FUNCIONES GENERALES ============
 
-// todas las peticiones a la api pasan por aqui
-async function solicitar(ruta, opciones) {
-  opciones = opciones || {};
+// hace una peticion a la api y devuelve el json
+async function pedir(ruta, opciones) {
+  // aqui sale la peticion al backend
+  const respuesta = await fetch(API + ruta, opciones);
+  // convierto la respuesta a objeto de javascript
+  const datos = await respuesta.json();
 
-  // si mando datos (POST) agrego el header de json
-  var config = {
-    ...opciones,
-    headers: {
-      ...(opciones.body ? { "Content-Type": "application/json" } : {}),
-      ...(opciones.headers || {})
-    }
-  };
-
-  var respuesta;
-
-  try {
-    // aqui sale la peticion al backend
-    respuesta = await fetch(BASE_URL + ruta, config);
-  } catch (e) {
-    throw new Error("No fue posible comunicarse con el servidor. Verifica que el backend esté en ejecución.");
-  }
-
-  // reviso si es json
-  var tipo = respuesta.headers.get("content-type") || "";
-  var datos = tipo.includes("application/json") ? await respuesta.json() : null;
-
-  // si el backend responde error (400, 404, 500...) uso su mensaje
+  // si el backend responde con error uso su mensaje
   if (!respuesta.ok) {
-    throw new Error(datos?.mensaje || "La solicitud falló con el código " + respuesta.status);
+    throw new Error(datos.mensaje || "Ocurrió un error");
   }
-
   return datos;
 }
 
-// ============ COMPONENTES ============
+// cambia los caracteres raros para que el texto no se lea como html (evita xss)
+function escapar(texto) {
+  return String(texto)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
 
-// clases css para las rarezas
-var CLASES_RAREZA = {
-  "Común": "rareza--comun",
-  "Poco común": "rareza--poco-comun",
-  "Raro": "rareza--raro",
-  "Épico": "rareza--epico",
-  "Legendario": "rareza--legendario"
-};
+// devuelve la imagen de un icono de minecraft, ej: "apple" -> /assets/minecraft/apple.png
+function icono(nombre) {
+  return `<img class="icono-minecraft" src="/assets/minecraft/${escapar(nombre)}.png" alt="">`;
+}
 
-// clases css para las dificultades
-var CLASES_DIFICULTAD = {
-  "Principiante": "dificultad--principiante",
-  "Intermedio": "dificultad--intermedio",
-  "Avanzado": "dificultad--avanzado"
-};
-
-// devuelven la clase css segun la rareza o dificultad
+// clase css segun la rareza
 function claseRareza(rareza) {
-  return CLASES_RAREZA[rareza] || "rareza--comun";
+  if (rareza === "Poco común") return "rareza--poco-comun";
+  if (rareza === "Raro") return "rareza--raro";
+  if (rareza === "Épico") return "rareza--epico";
+  if (rareza === "Legendario") return "rareza--legendario";
+  return "rareza--comun";
 }
 
+// clase css segun la dificultad
 function claseDificultad(dificultad) {
-  return CLASES_DIFICULTAD[dificultad] || "dificultad--principiante";
+  if (dificultad === "Intermedio") return "dificultad--intermedio";
+  if (dificultad === "Avanzado") return "dificultad--avanzado";
+  return "dificultad--principiante";
 }
 
-// solo acepto nombres tipo "diamond_sword" para los iconos
-var PATRON_ICONO = /^[a-z0-9_]+$/;
-
-// crea el elemento img para un icono de minecraft
-function crearIconoMinecraft(icono, className) {
-  className = className || "";
-
-  if (typeof icono === "string" && PATRON_ICONO.test(icono)) {
-    var imagen = document.createElement("img");
-    imagen.src = "/assets/minecraft/" + icono + ".png";
-    imagen.alt = "";
-    imagen.decoding = "async";
-    imagen.className = "icono-minecraft" + (className ? " " + className : "");
-    imagen.setAttribute("aria-hidden", "true");
-    return imagen;
-  }
-
-  // si no es nombre valido muestro texto
-  var span = document.createElement("span");
-  span.className = className;
-  span.textContent = icono || "";
-  span.setAttribute("aria-hidden", "true");
-  return span;
-}
-
-// crea tarjeta de item
-function crearTarjetaItem(item, alVer) {
-  var columna = document.createElement("div");
-  columna.className = "col-sm-6 col-xl-4";
-
-  var tarjeta = document.createElement("article");
-  tarjeta.className = "cp-card item-card h-100";
-
-  // parte visual con icono grande
-  var visual = document.createElement("div");
-  visual.className = "item-visual item-visual--" + (item.categoria_slug || "bloques");
-  visual.append(crearIconoMinecraft(item.icono));
-
-  if (item.destacado) {
-    var dest = document.createElement("span");
-    dest.className = "badge-destacado";
-    dest.textContent = "Destacado";
-    visual.append(dest);
-  }
-
-  // badge de categoria
-  var cat = document.createElement("span");
-  cat.className = "badge-categoria";
-  cat.append(crearIconoMinecraft(item.categoria_icono), document.createTextNode(" " + item.categoria));
-  visual.append(cat);
-
-  // cuerpo de la tarjeta
-  // textContent y no innerHTML, asi evito xss
-  var cuerpo = document.createElement("div");
-  cuerpo.className = "card-body d-flex flex-column";
-
-  var filaSup = document.createElement("div");
-  filaSup.className = "d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2";
-
-  var rareza = document.createElement("span");
-  rareza.className = "rareza " + claseRareza(item.rareza);
-  rareza.textContent = item.rareza;
-
-  var stack = document.createElement("span");
-  stack.className = "item-meta";
-  stack.textContent = "Stack: " + item.stack_max;
-  filaSup.append(rareza, stack);
-
-  var titulo = document.createElement("h3");
-  titulo.className = "card-title mb-2";
-  titulo.textContent = item.nombre;
-
-  var desc = document.createElement("p");
-  desc.className = "text-secondary small flex-grow-1 descripcion-corta mb-2";
-  desc.textContent = item.descripcion;
-
-  var meta = document.createElement("div");
-  meta.className = "item-meta mb-3";
-  meta.textContent = "Versión " + item.version;
-
-  var pie = document.createElement("div");
-  pie.className = "d-flex justify-content-between align-items-center gap-2 mt-auto";
-
-  var ver = document.createElement("span");
-  ver.className = "badge text-bg-light border";
-  ver.textContent = "v" + item.version;
-  pie.append(ver);
-
-  // en items abre el modal, en el inicio es un link
-  if (typeof alVer === "function") {
-    var btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "btn btn-sm btn-cp-outline";
-    btn.textContent = "Ver ficha";
-    btn.addEventListener("click", function () { alVer(item); });
-    pie.append(btn);
-  } else {
-    var link = document.createElement("a");
-    link.className = "btn btn-sm btn-cp-outline";
-    link.href = "/items.html";
-    link.textContent = "Ver ficha";
-    pie.append(link);
-  }
-
-  cuerpo.append(filaSup, titulo, desc, meta, pie);
-  tarjeta.append(visual, cuerpo);
-  columna.append(tarjeta);
-  return columna;
-}
-
-// crea tarjeta de guia
-function crearTarjetaGuia(guia, alVer) {
-  var columna = document.createElement("div");
-  columna.className = "col-lg-6";
-
-  var tarjeta = document.createElement("article");
-  tarjeta.className = "cp-card guia-card h-100";
-
-  var icono = document.createElement("div");
-  icono.className = "guia-icon";
-  icono.setAttribute("aria-hidden", "true");
-  icono.append(crearIconoMinecraft(guia.icono));
-
-  var contenido = document.createElement("div");
-  contenido.className = "flex-grow-1 d-flex flex-column";
-
-  // badges
-  var filaBadges = document.createElement("div");
-  filaBadges.className = "d-flex flex-wrap align-items-center gap-2 mb-2";
-
-  var dif = document.createElement("span");
-  dif.className = "dificultad " + claseDificultad(guia.dificultad);
-  dif.textContent = guia.dificultad;
-  filaBadges.append(dif);
-
-  var tema = document.createElement("span");
-  tema.className = "badge text-bg-light border";
-  tema.textContent = guia.tema;
-  filaBadges.append(tema);
-
-  if (guia.destacada) {
-    var dest = document.createElement("span");
-    dest.className = "badge text-bg-warning";
-    dest.textContent = "Destacada";
-    filaBadges.append(dest);
-  }
-
-  var titulo = document.createElement("h3");
-  titulo.className = "card-title mb-2";
-  titulo.textContent = guia.titulo;
-
-  var resumen = document.createElement("p");
-  resumen.className = "text-secondary small flex-grow-1 mb-3";
-  resumen.textContent = guia.resumen;
-
-  var pie = document.createElement("div");
-  pie.className = "d-flex flex-wrap justify-content-between align-items-center gap-2 mt-auto";
-
-  var metaDiv = document.createElement("div");
-  metaDiv.className = "guia-meta";
-
-  var reloj = document.createElement("i");
-  reloj.className = "bi bi-clock";
-  reloj.setAttribute("aria-hidden", "true");
-
-  var textoMeta = document.createElement("span");
-  textoMeta.textContent = guia.duracion + " · v" + guia.version;
-  metaDiv.append(reloj, textoMeta);
-
-  // en la pagina de guias el boton abre el modal, en el inicio es un link
-  if (typeof alVer === "function") {
-    var btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "btn btn-sm btn-cp";
-    btn.textContent = "Leer guía";
-    btn.addEventListener("click", function () { alVer(guia); });
-    pie.append(metaDiv, btn);
-  } else {
-    var link = document.createElement("a");
-    link.className = "btn btn-sm btn-cp";
-    link.href = "/guias.html";
-    link.textContent = "Leer guía";
-    pie.append(metaDiv, link);
-  }
-
-  contenido.append(filaBadges, titulo, resumen, pie);
-  tarjeta.append(icono, contenido);
-  columna.append(tarjeta);
-  return columna;
-}
-
-// muestra esqueletos de carga (bloques grises mientras llegan los datos)
-function mostrarEsqueletos(contenedor, cantidad, altura, claseCol) {
-  cantidad = cantidad || 6;
-  altura = altura || "320px";
-  claseCol = claseCol || "col-sm-6 col-xl-4";
-  contenedor.replaceChildren();
-
-  for (var i = 0; i < cantidad; i++) {
-    var col = document.createElement("div");
-    col.className = claseCol;
-    var bloque = document.createElement("div");
-    bloque.className = "skeleton";
-    bloque.style.minHeight = altura;
-    bloque.setAttribute("aria-hidden", "true");
-    col.append(bloque);
-    contenedor.append(col);
-  }
-}
-
-// muestra alerta de bootstrap
+// muestra una alerta de bootstrap
 function mostrarAlerta(contenedor, tipo, mensaje) {
-  contenedor.replaceChildren();
-  var alerta = document.createElement("div");
-  alerta.className = "alert alert-" + tipo + " d-flex align-items-start gap-2";
-  alerta.setAttribute("role", tipo === "danger" ? "alert" : "status");
-
-  var ic = document.createElement("i");
-  ic.className = "bi " + (tipo === "danger" ? "bi-exclamation-triangle-fill" : "bi-check-circle-fill");
-  ic.setAttribute("aria-hidden", "true");
-
-  var txt = document.createElement("span");
-  txt.textContent = mensaje;
-
-  alerta.append(ic, txt);
-  contenedor.append(alerta);
+  contenedor.innerHTML = `<div class="alert alert-${tipo}" role="alert">${escapar(mensaje)}</div>`;
 }
 
-// borra la alerta que haya en el contenedor
-function limpiarAlerta(contenedor) {
-  contenedor.replaceChildren();
+// html de la tarjeta de un item
+// si conBoton es true muestra un boton para abrir la ficha, si no un link
+function tarjetaItem(item, conBoton) {
+  // en el inicio es un link a items.html, en items es un boton que abre el modal
+  let boton = `<a class="btn btn-sm btn-cp-outline" href="/items.html">Ver ficha</a>`;
+  if (conBoton) {
+    boton = `<button type="button" class="btn btn-sm btn-cp-outline btn-ver" data-id="${item.item_id}">Ver ficha</button>`;
+  }
+
+  // la etiqueta "Destacado" solo sale si el item lo es
+  let destacado = "";
+  if (item.destacado) {
+    destacado = `<span class="badge-destacado">Destacado</span>`;
+  }
+
+  // armo la tarjeta con los datos, siempre pasando el texto por escapar()
+  return `
+    <div class="col-sm-6 col-xl-4">
+      <article class="cp-card item-card h-100">
+        <div class="item-visual item-visual--${escapar(item.categoria_slug)}">
+          ${icono(item.icono)}
+          ${destacado}
+          <span class="badge-categoria">${icono(item.categoria_icono)} ${escapar(item.categoria)}</span>
+        </div>
+        <div class="card-body d-flex flex-column">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="rareza ${claseRareza(item.rareza)}">${escapar(item.rareza)}</span>
+            <span class="item-meta">Stack: ${item.stack_max}</span>
+          </div>
+          <h3 class="card-title mb-2">${escapar(item.nombre)}</h3>
+          <p class="text-secondary small flex-grow-1 descripcion-corta mb-2">${escapar(item.descripcion)}</p>
+          <div class="item-meta mb-3">Versión ${escapar(item.version)}</div>
+          <div class="d-flex justify-content-between align-items-center mt-auto">
+            <span class="badge text-bg-light border">v${escapar(item.version)}</span>
+            ${boton}
+          </div>
+        </div>
+      </article>
+    </div>`;
+}
+
+// html de la tarjeta de una guia
+function tarjetaGuia(guia, conBoton) {
+  // igual que la tarjeta de item: link en el inicio, boton en guias
+  let boton = `<a class="btn btn-sm btn-cp" href="/guias.html">Leer guía</a>`;
+  if (conBoton) {
+    boton = `<button type="button" class="btn btn-sm btn-cp btn-ver" data-id="${guia.guia_id}">Leer guía</button>`;
+  }
+
+  let destacada = "";
+  if (guia.destacada) {
+    destacada = `<span class="badge text-bg-warning">Destacada</span>`;
+  }
+
+  return `
+    <div class="col-lg-6">
+      <article class="cp-card guia-card h-100">
+        <div class="guia-icon">${icono(guia.icono)}</div>
+        <div class="flex-grow-1 d-flex flex-column">
+          <div class="d-flex flex-wrap gap-2 mb-2">
+            <span class="dificultad ${claseDificultad(guia.dificultad)}">${escapar(guia.dificultad)}</span>
+            <span class="badge text-bg-light border">${escapar(guia.tema)}</span>
+            ${destacada}
+          </div>
+          <h3 class="card-title mb-2">${escapar(guia.titulo)}</h3>
+          <p class="text-secondary small flex-grow-1 mb-3">${escapar(guia.resumen)}</p>
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-auto">
+            <div class="guia-meta"><i class="bi bi-clock"></i> ${escapar(guia.duracion)} · v${escapar(guia.version)}</div>
+            ${boton}
+          </div>
+        </div>
+      </article>
+    </div>`;
+}
+
+// llena un select con opciones [{ valor, texto }]
+function llenarSelect(select, opciones, textoInicial) {
+  // la primera opcion vacia es "todas"
+  let html = `<option value="">${textoInicial}</option>`;
+  for (const op of opciones) {
+    html += `<option value="${escapar(op.valor)}">${escapar(op.texto)}</option>`;
+  }
+  select.innerHTML = html;
 }
 
 // ============ PAGINA: INICIO ============
 
-// solo corre en index.html
+// solo corre en index.html, que es la unica con contenedorCategorias
+// aqui uso .then() y las 4 peticiones salen al mismo tiempo
 if (document.getElementById("contenedorCategorias")) {
-  (function () {
-    // formato de numeros chileno (1.234)
-    var numero = new Intl.NumberFormat("es-CL");
+  // numeros del banner
+  pedir("/estadisticas")
+    .then((datos) => {
+      document.getElementById("statItems").textContent = datos.total_items;
+      document.getElementById("statGuias").textContent = datos.total_guias;
+      document.getElementById("statCategorias").textContent = datos.total_categorias;
+      document.getElementById("statVersiones").textContent = datos.total_versiones;
+    })
+    .catch((error) => console.log(error));
 
-    var contenedorCategorias = document.getElementById("contenedorCategorias");
-    var contenedorItems = document.getElementById("itemsDestacados");
-    var contenedorGuias = document.getElementById("guiasDestacadas");
-    var alertaCategorias = document.getElementById("alertaCategorias");
-    var alertaItems = document.getElementById("alertaItems");
-    var alertaGuias = document.getElementById("alertaGuias");
-
-    // cargo las estadisticas del banner
-    async function cargarEstadisticas() {
-      try {
-        var datos = await solicitar("/estadisticas");
-        document.getElementById("statItems").textContent = numero.format(datos.total_items);
-        document.getElementById("statGuias").textContent = numero.format(datos.total_guias);
-        document.getElementById("statCategorias").textContent = numero.format(datos.total_categorias);
-        document.getElementById("statVersiones").textContent = numero.format(datos.total_versiones);
-      } catch (e) {
-        ["statItems", "statGuias", "statCategorias", "statVersiones"].forEach(function (id) {
-          document.getElementById(id).textContent = "—";
-        });
+  // categorias: al hacer clic abre items.html filtrado por esa categoria
+  pedir("/meta")
+    .then((datos) => {
+      let html = "";
+      for (const cat of datos.categorias) {
+        html += `
+          <div class="col-sm-6 col-lg-4 col-xl-2">
+            <a class="categoria-card" href="/items.html?categoria=${cat.categoria_id}">
+              <span class="categoria-icon">${icono(cat.icono)}</span>
+              <h3 class="h6 mb-1">${escapar(cat.nombre)}</h3>
+              <p class="small text-secondary mb-2">${escapar(cat.descripcion)}</p>
+              <span class="conteo">${cat.total_items} ítems</span>
+            </a>
+          </div>`;
       }
-    }
+      document.getElementById("contenedorCategorias").innerHTML = html;
+    })
+    .catch((error) => mostrarAlerta(document.getElementById("alertaCategorias"), "danger", error.message));
 
-    // cargo las categorias
-    async function cargarCategorias() {
-      try {
-        var resp = await solicitar("/meta");
-        contenedorCategorias.replaceChildren();
-        limpiarAlerta(alertaCategorias);
-
-        // armo todo en un fragmento y lo agrego de una vez al dom
-        var frag = document.createDocumentFragment();
-
-        resp.categorias.forEach(function (cat) {
-          var col = document.createElement("div");
-          col.className = "col-sm-6 col-lg-4 col-xl-2";
-
-          var enlace = document.createElement("a");
-          enlace.className = "categoria-card";
-          // al hacer clic abre items.html ya filtrado por esta categoria
-          enlace.href = "/items.html?categoria=" + cat.categoria_id;
-
-          var icono = document.createElement("span");
-          icono.className = "categoria-icon";
-          icono.setAttribute("aria-hidden", "true");
-          icono.append(crearIconoMinecraft(cat.icono));
-
-          var titulo = document.createElement("h3");
-          titulo.className = "h6 mb-1";
-          titulo.textContent = cat.nombre;
-
-          var desc = document.createElement("p");
-          desc.className = "small text-secondary mb-2";
-          desc.textContent = cat.descripcion;
-
-          var conteo = document.createElement("span");
-          conteo.className = "conteo";
-          conteo.textContent = cat.total_items + " ítem" + (cat.total_items === 1 ? "" : "s");
-
-          enlace.append(icono, titulo, desc, conteo);
-          col.append(enlace);
-          frag.append(col);
-        });
-
-        contenedorCategorias.append(frag);
-      } catch (error) {
-        mostrarAlerta(alertaCategorias, "danger", error.message);
+  // 3 items destacados
+  pedir("/items?destacados=true&orden=rareza")
+    .then((datos) => {
+      let html = "";
+      for (const item of datos.items.slice(0, 3)) {
+        html += tarjetaItem(item, false);
       }
-    }
+      document.getElementById("itemsDestacados").innerHTML = html;
+    })
+    .catch((error) => mostrarAlerta(document.getElementById("alertaItems"), "danger", error.message));
 
-    // cargo items destacados
-    async function cargarItemsDestacados() {
-      mostrarEsqueletos(contenedorItems, 3, "330px");
-      try {
-        var datos = await solicitar("/items?destacados=true&orden=rareza");
-        contenedorItems.replaceChildren();
-        limpiarAlerta(alertaItems);
-
-        var frag = document.createDocumentFragment();
-        datos.items.slice(0, 3).forEach(function (item) {
-          frag.append(crearTarjetaItem(item));
-        });
-        contenedorItems.append(frag);
-      } catch (error) {
-        contenedorItems.replaceChildren();
-        mostrarAlerta(alertaItems, "danger", error.message);
+  // 2 guias destacadas
+  pedir("/guias?destacadas=true")
+    .then((datos) => {
+      let html = "";
+      for (const guia of datos.guias.slice(0, 2)) {
+        html += tarjetaGuia(guia, false);
       }
-    }
-
-    // cargo guias destacadas
-    async function cargarGuiasDestacadas() {
-      mostrarEsqueletos(contenedorGuias, 2, "240px", "col-lg-6");
-      try {
-        var datos = await solicitar("/guias?destacadas=true&orden=titulo");
-        contenedorGuias.replaceChildren();
-        limpiarAlerta(alertaGuias);
-
-        var frag = document.createDocumentFragment();
-        datos.guias.slice(0, 2).forEach(function (guia) {
-          frag.append(crearTarjetaGuia(guia));
-        });
-        contenedorGuias.append(frag);
-      } catch (error) {
-        contenedorGuias.replaceChildren();
-        mostrarAlerta(alertaGuias, "danger", error.message);
-      }
-    }
-
-    // ejecuto todo (las 4 peticiones van en paralelo)
-    cargarEstadisticas();
-    cargarCategorias();
-    cargarItemsDestacados();
-    cargarGuiasDestacadas();
-  })();
+      document.getElementById("guiasDestacadas").innerHTML = html;
+    })
+    .catch((error) => mostrarAlerta(document.getElementById("alertaGuias"), "danger", error.message));
 }
 
 // ============ PAGINA: ITEMS ============
 
-// este bloque solo corre si estoy en items.html
+// solo corre en items.html
 if (document.getElementById("formFiltros")) {
-  (function () {
-    var formFiltros = document.getElementById("formFiltros");
-    var inputBuscar = document.getElementById("buscar");
-    var selectCategoria = document.getElementById("categoria");
-    var selectRareza = document.getElementById("rareza");
-    var selectVersion = document.getElementById("version");
-    var selectOrden = document.getElementById("orden");
-    var btnLimpiar = document.getElementById("btnLimpiar");
-    var contenedorItems = document.getElementById("listaItems");
-    var contadorResultados = document.getElementById("contadorResultados");
-    var resumenFiltros = document.getElementById("resumenFiltros");
-    var alertaItems = document.getElementById("alertaItems");
+  // guardo los elementos que mas uso
+  const inputBuscar = document.getElementById("buscar");
+  const selectCategoria = document.getElementById("categoria");
+  const selectRareza = document.getElementById("rareza");
+  const selectVersion = document.getElementById("version");
+  const selectOrden = document.getElementById("orden");
+  const listaItems = document.getElementById("listaItems");
+  const alertaItems = document.getElementById("alertaItems");
+  const formItem = document.getElementById("formItem");
+  // modales de bootstrap: uno para ver la ficha y otro para agregar
+  const modalDetalle = new bootstrap.Modal(document.getElementById("modalDetalleItem"));
+  const modalAgregar = new bootstrap.Modal(document.getElementById("modalAgregarItem"));
+  // sirve para esperar a que el usuario deje de escribir
+  let temporizador;
 
-    var modalDetalleItem = bootstrap.Modal.getOrCreateInstance(
-      document.getElementById("modalDetalleItem")
-    );
+  // lleno los selects de filtros y del formulario
+  async function cargarSelects() {
+    const meta = await pedir("/meta");
 
-    // formulario para agregar
-    var formItem = document.getElementById("formItem");
-    var iconoItem = document.getElementById("iconoItem");
-    var descripcionItem = document.getElementById("descripcionItem");
-    var alertaFormularioItem = document.getElementById("alertaFormularioItem");
-    var btnGuardarItem = document.getElementById("btnGuardarItem");
-    var elementoModalAgregar = document.getElementById("modalAgregarItem");
-    var modalAgregarItem = bootstrap.Modal.getOrCreateInstance(elementoModalAgregar);
+    // paso los datos al formato { valor, texto } que usa llenarSelect
+    const categorias = meta.categorias.map((c) => ({ valor: c.categoria_id, texto: c.nombre }));
+    const rarezas = meta.rarezas.map((r) => ({ valor: r, texto: r }));
+    const versiones = meta.versiones.map((v) => ({ valor: v, texto: "Versión " + v }));
 
-    // filtros que vienen en la url al abrir la pagina (ej: ?categoria=2)
-    var parametrosIniciales = new URLSearchParams(window.location.search);
-    var meta = { categorias: [], versiones: [], rarezas: [] };
-    // numero de la ultima peticion, sirve para ignorar respuestas viejas
-    var peticionActual = 0;
-    // temporizador para esperar a que el usuario deje de escribir
-    var temporizadorBusqueda;
+    llenarSelect(selectCategoria, categorias, "Todas las categorías");
+    llenarSelect(selectRareza, rarezas, "Todas las rarezas");
+    llenarSelect(selectVersion, versiones, "Todas las versiones");
+    llenarSelect(document.getElementById("categoriaItem"), categorias, "Selecciona una categoría");
+    llenarSelect(document.getElementById("rarezaItem"), rarezas, "Selecciona una rareza");
 
-    // leo el valor actual de cada filtro del formulario
-    function leerFiltros() {
-      return {
-        buscar: inputBuscar.value.trim(),
-        categoria: selectCategoria.value,
-        rareza: selectRareza.value,
-        version: selectVersion.value,
-        orden: selectOrden.value || "nombre"
-      };
+    // sugerencias para el campo version del formulario
+    let html = "";
+    for (const v of meta.versiones) {
+      html += `<option value="${escapar(v)}">`;
     }
+    document.getElementById("listaVersiones").innerHTML = html;
+  }
 
-    // guardo los filtros en la url para no perderlos al recargar
-    function actualizarUrl(filtros) {
-      var params = new URLSearchParams();
-      if (filtros.buscar) params.set("buscar", filtros.buscar);
-      if (filtros.categoria) params.set("categoria", filtros.categoria);
-      if (filtros.rareza) params.set("rareza", filtros.rareza);
-      if (filtros.version) params.set("version", filtros.version);
-      if (filtros.orden && filtros.orden !== "nombre") params.set("orden", filtros.orden);
+  // aqui se hace la busqueda de items
+  async function cargarItems() {
+    // armo la url, ej: /api/items?buscar=espada&rareza=Raro
+    const params = new URLSearchParams();
+    if (inputBuscar.value.trim()) params.set("buscar", inputBuscar.value.trim());
+    if (selectCategoria.value) params.set("categoria", selectCategoria.value);
+    if (selectRareza.value) params.set("rareza", selectRareza.value);
+    if (selectVersion.value) params.set("version", selectVersion.value);
+    params.set("orden", selectOrden.value);
 
-      var q = params.toString();
-      window.history.replaceState(null, "", window.location.pathname + (q ? "?" + q : ""));
-    }
+    // mientras llega la respuesta muestro "Cargando..."
+    document.getElementById("contadorResultados").textContent = "Cargando...";
+    alertaItems.innerHTML = "";
 
-    // llena un select con opciones
-    function llenarSelect(select, opciones, textoInicial) {
-      var val = select.value;
-      select.replaceChildren();
-      select.add(new Option(textoInicial, ""));
-      opciones.forEach(function (op) {
-        select.add(new Option(op.texto, String(op.valor)));
-      });
-      // si ya habia algo elegido lo mantengo
-      if (val && [...select.options].some(function (o) { return o.value === val; })) {
-        select.value = val;
-      }
-    }
+    try {
+      const datos = await pedir("/items?" + params.toString());
+      document.getElementById("contadorResultados").textContent = datos.total + " ítems";
 
-    // cargo los datos de los selects
-    async function cargarMeta() {
-      meta = await solicitar("/meta");
-
-      llenarSelect(selectCategoria,
-        meta.categorias.map(function (c) { return { valor: c.categoria_id, texto: c.nombre + " (" + c.total_items + ")" }; }),
-        "Todas las categorías"
-      );
-      llenarSelect(selectRareza,
-        meta.rarezas.map(function (r) { return { valor: r, texto: r }; }),
-        "Todas las rarezas"
-      );
-      llenarSelect(selectVersion,
-        meta.versiones.map(function (v) { return { valor: v, texto: "Versión " + v }; }),
-        "Todas las versiones"
-      );
-
-      // selects del formulario para agregar
-      llenarSelect(document.getElementById("categoriaItem"),
-        meta.categorias.map(function (c) { return { valor: c.categoria_id, texto: c.nombre }; }),
-        "Selecciona una categoría"
-      );
-      llenarSelect(document.getElementById("rarezaItem"),
-        meta.rarezas.map(function (r) { return { valor: r, texto: r }; }),
-        "Selecciona una rareza"
-      );
-      document.getElementById("listaVersiones").replaceChildren(
-        ...meta.versiones.map(function (v) { return new Option(v, v); })
-      );
-    }
-
-    // aplico filtros de la url
-    function aplicarParametrosIniciales() {
-      inputBuscar.value = parametrosIniciales.get("buscar") || "";
-      ["categoria", "rareza", "version", "orden"].forEach(function (nombre) {
-        var el = document.getElementById(nombre);
-        var val = parametrosIniciales.get(nombre);
-        if (val && [...el.options].some(function (o) { return o.value === val; })) {
-          el.value = val;
-        }
-      });
-    }
-
-    // texto que dice que filtros estan activos
-    function actualizarResumen(filtros) {
-      var partes = [];
-      if (filtros.buscar) partes.push('texto "' + filtros.buscar + '"');
-      if (filtros.categoria) {
-        var c = meta.categorias.find(function (el) { return String(el.categoria_id) === filtros.categoria; });
-        if (c) partes.push("categoría " + c.nombre);
-      }
-      if (filtros.rareza) partes.push("rareza " + filtros.rareza);
-      if (filtros.version) partes.push("versión " + filtros.version);
-      if (filtros.orden !== "nombre") {
-        partes.push("orden: " + (selectOrden.selectedOptions[0]?.textContent || filtros.orden));
-      }
-      resumenFiltros.textContent = partes.length
-        ? "Filtros activos: " + partes.join(" · ")
-        : "Mostrando toda la enciclopedia.";
-    }
-
-    // dibujo las tarjetas de los items que llegaron
-    function renderizarItems(items) {
-      contenedorItems.replaceChildren();
-
-      // si no hay resultados
-      if (items.length === 0) {
-        var col = document.createElement("div");
-        col.className = "col-12";
-        var vacio = document.createElement("div");
-        vacio.className = "empty-state";
-
-        var ic = document.createElement("div");
-        ic.className = "empty-icon";
-        ic.setAttribute("aria-hidden", "true");
-        ic.append(crearIconoMinecraft("crafting_table"));
-
-        var t = document.createElement("h3");
-        t.className = "h5 mt-3";
-        t.textContent = "No encontramos ítems con esos filtros";
-
-        var p = document.createElement("p");
-        p.className = "text-secondary mb-0";
-        p.textContent = "Prueba con otra categoría, rareza o versión, o limpia los filtros.";
-
-        var b = document.createElement("button");
-        b.type = "button";
-        b.className = "btn btn-cp mt-3";
-        b.textContent = "Limpiar filtros";
-        b.addEventListener("click", limpiarFiltros);
-
-        vacio.append(ic, t, p, b);
-        col.append(vacio);
-        contenedorItems.append(col);
+      // si no hay resultados muestro un mensaje
+      if (datos.items.length === 0) {
+        listaItems.innerHTML = `<p class="text-secondary text-center py-5">No se encontraron ítems con esos filtros.</p>`;
         return;
       }
 
-      var frag = document.createDocumentFragment();
-      items.forEach(function (item) {
-        frag.append(crearTarjetaItem(item, abrirDetalle));
-      });
-      contenedorItems.append(frag);
-    }
-
-    // aqui se hace la busqueda de items
-    async function cargarItems() {
-      var filtros = leerFiltros();
-      // le doy un numero a esta peticion
-      var num = ++peticionActual;
-
-      actualizarUrl(filtros);
-      actualizarResumen(filtros);
-      contenedorItems.setAttribute("aria-busy", "true");
-      contadorResultados.textContent = "Cargando…";
-      mostrarEsqueletos(contenedorItems, 6, "330px");
-      limpiarAlerta(alertaItems);
-
-      // armo la url, ej: /api/items?buscar=espada
-      var params = new URLSearchParams();
-      if (filtros.buscar) params.set("buscar", filtros.buscar);
-      if (filtros.categoria) params.set("categoria", filtros.categoria);
-      if (filtros.rareza) params.set("rareza", filtros.rareza);
-      if (filtros.version) params.set("version", filtros.version);
-      params.set("orden", filtros.orden);
-
-      try {
-        var datos = await solicitar("/items?" + params.toString());
-        // si ya hay una busqueda mas nueva, ignoro esta
-        if (num !== peticionActual) return;
-        renderizarItems(datos.items);
-        contadorResultados.textContent = datos.total + " ítem" + (datos.total === 1 ? "" : "s");
-      } catch (error) {
-        if (num !== peticionActual) return;
-        contenedorItems.replaceChildren();
-        contadorResultados.textContent = "0 ítems";
-        mostrarAlerta(alertaItems, "danger", error.message);
-      } finally {
-        if (num === peticionActual) contenedorItems.removeAttribute("aria-busy");
+      let html = "";
+      // junto todas las tarjetas y las pongo de una vez en la pagina
+      for (const item of datos.items) {
+        html += tarjetaItem(item, true);
       }
+      listaItems.innerHTML = html;
+    } catch (error) {
+      // si falla muestro el error en una alerta roja
+      listaItems.innerHTML = "";
+      document.getElementById("contadorResultados").textContent = "0 ítems";
+      mostrarAlerta(alertaItems, "danger", error.message);
     }
+  }
 
-    // vuelvo los filtros a su valor inicial y recargo
-    function limpiarFiltros() {
-      formFiltros.reset();
-      selectOrden.value = "nombre";
-      return cargarItems();
-    }
-
-    // lleno el modal con datos del item
-    function llenarDetalle(item) {
-      var visual = document.getElementById("detalleItemVisual");
-      visual.className = "item-visual item-visual--" + (item.categoria_slug || "bloques");
-      document.getElementById("detalleItemIcono").replaceChildren(crearIconoMinecraft(item.icono));
-      document.getElementById("detalleItemCategoria").replaceChildren(
-        crearIconoMinecraft(item.categoria_icono),
-        document.createTextNode(" " + item.categoria)
-      );
+  // pido un item por su id y lo muestro en el modal
+  async function verItem(id) {
+    try {
+      const item = await pedir("/items/" + id);
+      // relleno cada parte del modal con los datos del item
+      document.getElementById("detalleItemVisual").className = "item-visual item-visual--" + item.categoria_slug;
+      document.getElementById("detalleItemIcono").innerHTML = icono(item.icono);
+      document.getElementById("detalleItemCategoria").innerHTML = icono(item.categoria_icono) + " " + escapar(item.categoria);
       document.getElementById("detalleItemNombre").textContent = item.nombre;
-
-      var r = document.getElementById("detalleItemRareza");
-      r.className = "rareza " + claseRareza(item.rareza);
-      r.textContent = item.rareza;
-
+      document.getElementById("detalleItemRareza").className = "rareza " + claseRareza(item.rareza);
+      document.getElementById("detalleItemRareza").textContent = item.rareza;
       document.getElementById("detalleItemVersion").textContent = "v" + item.version;
       document.getElementById("detalleItemStack").textContent = "Stack máximo: " + item.stack_max;
       document.getElementById("detalleItemDescripcion").textContent = item.descripcion;
       document.getElementById("detalleItemObtencion").textContent = item.obtencion;
       document.getElementById("detalleItemDestacado").classList.toggle("d-none", !item.destacado);
+      modalDetalle.show();
+    } catch (error) {
+      mostrarAlerta(alertaItems, "danger", error.message);
     }
+  }
 
-    // pido el item completo por su id y abro el modal de bootstrap
-    async function abrirDetalle(itemRes) {
-      try {
-        var item = await solicitar("/items/" + itemRes.item_id);
-        llenarDetalle(item);
-        modalDetalleItem.show();
-      } catch (error) {
-        mostrarAlerta(alertaItems, "danger", error.message);
-      }
-    }
+  // muestra el icono elegido y cuenta las letras de la descripcion
+  function actualizarFormulario() {
+    document.getElementById("vistaPreviaIcono").innerHTML = icono(document.getElementById("iconoItem").value);
+    document.getElementById("contadorDescripcionItem").textContent = document.getElementById("descripcionItem").value.length;
+  }
 
-    // muestra el icono elegido y cuenta los caracteres
-    function actualizarFormulario() {
-      document.getElementById("vistaPreviaIcono").replaceChildren(crearIconoMinecraft(iconoItem.value));
-      document.getElementById("contadorDescripcionItem").textContent = descripcionItem.value.length;
-    }
+  // guardo el item nuevo
+  async function guardarItem(e) {
+    // para que el formulario no recargue la pagina
+    e.preventDefault();
 
-    // bloquea el boton mientras se guarda
-    function bloquearFormulario(bloqueado) {
-      btnGuardarItem.disabled = bloqueado;
-      document.getElementById("spinnerGuardarItem").classList.toggle("d-none", !bloqueado);
-      document.getElementById("textoGuardarItem").textContent = bloqueado ? "Guardando…" : "Guardar ítem";
-    }
+    // bootstrap marca en rojo los campos que faltan
+    formItem.classList.add("was-validated");
+    if (!formItem.checkValidity()) return;
 
-    // envio el item nuevo al backend
-    async function guardarItem(e) {
-      // evito que el formulario recargue la pagina
-      e.preventDefault();
-      // was-validated muestra los errores de bootstrap en los campos
-      formItem.classList.add("was-validated");
-      // si falta algun campo requerido no envio nada
-      if (!formItem.checkValidity()) return;
+    // junto los datos del formulario en un objeto
+    const datos = {
+      nombre: document.getElementById("nombreItem").value,
+      descripcion: document.getElementById("descripcionItem").value,
+      obtencion: document.getElementById("obtencionItem").value,
+      categoria_id: Number(document.getElementById("categoriaItem").value),
+      rareza: document.getElementById("rarezaItem").value,
+      version: document.getElementById("versionItem").value,
+      stack_max: Number(document.getElementById("stackItem").value),
+      icono: document.getElementById("iconoItem").value,
+      destacado: document.getElementById("destacadoItem").checked
+    };
 
-      // junto los datos del formulario en un objeto
-      var campos = new FormData(formItem);
-      var datos = {
-        nombre: campos.get("nombre").trim(),
-        descripcion: campos.get("descripcion").trim(),
-        obtencion: campos.get("obtencion").trim(),
-        categoria_id: Number(campos.get("categoria_id")),
-        rareza: campos.get("rareza"),
-        version: campos.get("version").trim(),
-        stack_max: Number(campos.get("stack_max")),
-        icono: campos.get("icono"),
-        destacado: campos.has("destacado")
-      };
+    // desactivo el boton para que no lo apreten dos veces
+    const boton = document.getElementById("btnGuardarItem");
+    boton.disabled = true;
 
-      bloquearFormulario(true);
-      limpiarAlerta(alertaFormularioItem);
+    try {
+      // envio el item como json con POST
+      const respuesta = await pedir("/items", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(datos)
+      });
 
-      var respuesta;
-      try {
-        // envio el item como json al endpoint POST /api/items
-        respuesta = await solicitar("/items", { method: "POST", body: JSON.stringify(datos) });
-      } catch (error) {
-        mostrarAlerta(alertaFormularioItem, "danger", error.message);
-        return;
-      } finally {
-        bloquearFormulario(false);
-      }
-
-      // si se guardo bien cierro el modal y limpio el formulario
-      modalAgregarItem.hide();
+      // si se guardo: cierro el modal, limpio el formulario y recargo la lista
+      modalAgregar.hide();
       formItem.reset();
       formItem.classList.remove("was-validated");
       actualizarFormulario();
-
-      // recargo todo para que se vea el item nuevo
-      try { await cargarMeta(); } catch (error) { mostrarAlerta(alertaItems, "danger", error.message); }
-      await limpiarFiltros();
-      mostrarAlerta(alertaItems, "success", 'Se agregó "' + respuesta.item.nombre + '" a la enciclopedia.');
+      await cargarSelects();
+      await cargarItems();
+      mostrarAlerta(alertaItems, "success", `Se agregó "${respuesta.item.nombre}" a la enciclopedia.`);
+    } catch (error) {
+      mostrarAlerta(document.getElementById("alertaFormularioItem"), "danger", error.message);
     }
 
-    // eventos
-    formItem.addEventListener("submit", guardarItem);
-    iconoItem.addEventListener("change", actualizarFormulario);
-    descripcionItem.addEventListener("input", actualizarFormulario);
-    elementoModalAgregar.addEventListener("hidden.bs.modal", function () { limpiarAlerta(alertaFormularioItem); });
-    formFiltros.addEventListener("submit", function (e) { e.preventDefault(); cargarItems(); });
-    // busca cuando dejas de escribir por 350 ms
-    inputBuscar.addEventListener("input", function () {
-      clearTimeout(temporizadorBusqueda);
-      temporizadorBusqueda = setTimeout(cargarItems, 350);
-    });
-    // los selects filtran apenas cambian
-    selectCategoria.addEventListener("change", cargarItems);
-    selectRareza.addEventListener("change", cargarItems);
-    selectVersion.addEventListener("change", cargarItems);
-    selectOrden.addEventListener("change", cargarItems);
-    btnLimpiar.addEventListener("click", limpiarFiltros);
+    boton.disabled = false;
+  }
 
-    // al abrir: selects, filtros de la url y despues los items
-    (async function () {
-      actualizarFormulario();
-      mostrarEsqueletos(contenedorItems, 6, "330px");
-      try { await cargarMeta(); } catch (e) { mostrarAlerta(alertaItems, "danger", e.message); }
-      aplicarParametrosIniciales();
-      await cargarItems();
-    })();
-  })();
+  // busca cuando dejas de escribir por 350 ms, asi no hace una peticion por letra
+  inputBuscar.addEventListener("input", () => {
+    clearTimeout(temporizador);
+    temporizador = setTimeout(cargarItems, 350);
+  });
+
+  // los selects filtran apenas cambian
+  selectCategoria.addEventListener("change", cargarItems);
+  selectRareza.addEventListener("change", cargarItems);
+  selectVersion.addEventListener("change", cargarItems);
+  selectOrden.addEventListener("change", cargarItems);
+
+  // si aprieta enter en el buscador no recargo la pagina, solo busco
+  document.getElementById("formFiltros").addEventListener("submit", (e) => {
+    e.preventDefault();
+    cargarItems();
+  });
+
+  // boton limpiar: vuelve los filtros a como estaban y busca de nuevo
+  document.getElementById("btnLimpiar").addEventListener("click", () => {
+    document.getElementById("formFiltros").reset();
+    cargarItems();
+  });
+
+  // los botones "ver ficha" se crean despues, por eso escucho el clic en la lista
+  listaItems.addEventListener("click", (e) => {
+    const boton = e.target.closest(".btn-ver");
+    if (boton) verItem(boton.dataset.id);
+  });
+
+  // eventos del formulario para agregar
+  formItem.addEventListener("submit", guardarItem);
+  document.getElementById("iconoItem").addEventListener("change", actualizarFormulario);
+  document.getElementById("descripcionItem").addEventListener("input", actualizarFormulario);
+
+  // al abrir la pagina: lleno los selects, reviso si viene ?categoria= en la url y busco
+  cargarSelects()
+    .then(() => {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("categoria")) selectCategoria.value = params.get("categoria");
+      if (params.get("buscar")) inputBuscar.value = params.get("buscar");
+      cargarItems();
+    })
+    .catch((error) => mostrarAlerta(alertaItems, "danger", error.message));
+
+  actualizarFormulario();
 }
 
 // ============ PAGINA: GUIAS ============
 
-// solo corre en guias.html, igual que items
+// solo corre en guias.html, funciona igual que items pero sin formulario
 if (document.getElementById("formFiltrosGuias")) {
-  (function () {
-    var formFiltros = document.getElementById("formFiltrosGuias");
-    var inputBuscar = document.getElementById("buscarGuia");
-    var selectDificultad = document.getElementById("dificultadGuia");
-    var selectTema = document.getElementById("temaGuia");
-    var selectOrden = document.getElementById("ordenGuia");
-    var btnLimpiar = document.getElementById("btnLimpiarGuias");
-    var contenedorGuias = document.getElementById("listaGuias");
-    var contadorGuias = document.getElementById("contadorGuias");
-    var resumenFiltros = document.getElementById("resumenFiltrosGuias");
-    var alertaGuias = document.getElementById("alertaGuias");
+  const inputBuscar = document.getElementById("buscarGuia");
+  const selectDificultad = document.getElementById("dificultadGuia");
+  const selectTema = document.getElementById("temaGuia");
+  const selectOrden = document.getElementById("ordenGuia");
+  const listaGuias = document.getElementById("listaGuias");
+  const alertaGuias = document.getElementById("alertaGuias");
+  const modalDetalle = new bootstrap.Modal(document.getElementById("modalDetalleGuia"));
+  let temporizador;
 
-    var modalDetalle = bootstrap.Modal.getOrCreateInstance(
-      document.getElementById("modalDetalleGuia")
-    );
+  // aqui se hace la busqueda de guias, igual que en items
+  async function cargarGuias() {
+    const params = new URLSearchParams();
+    if (inputBuscar.value.trim()) params.set("buscar", inputBuscar.value.trim());
+    if (selectDificultad.value) params.set("dificultad", selectDificultad.value);
+    if (selectTema.value) params.set("tema", selectTema.value);
+    params.set("orden", selectOrden.value);
 
-    // filtros que vienen en la url al abrir la pagina
-    var parametrosIniciales = new URLSearchParams(window.location.search);
-    var meta = { dificultades: [], temas: [] };
-    // numero de la ultima peticion, sirve para ignorar respuestas viejas
-    var peticionActual = 0;
-    // temporizador para esperar a que el usuario deje de escribir
-    var temporizadorBusqueda;
+    // mientras llega la respuesta muestro "Cargando..."
+    document.getElementById("contadorGuias").textContent = "Cargando...";
+    alertaGuias.innerHTML = "";
 
-    // llena un select con opciones (manteniendo lo elegido)
-    function llenarSelect(select, opciones, textoInicial) {
-      var val = select.value;
-      select.replaceChildren();
-      select.add(new Option(textoInicial, ""));
-      opciones.forEach(function (op) { select.add(new Option(op, op)); });
-      if (val && [...select.options].some(function (o) { return o.value === val; })) {
-        select.value = val;
-      }
-    }
-
-    // cargo las dificultades y temas para los selects
-    async function cargarMeta() {
-      meta = await solicitar("/meta");
-      llenarSelect(selectDificultad, meta.dificultades, "Todas las dificultades");
-      llenarSelect(selectTema, meta.temas, "Todos los temas");
-    }
-
-    // aplico los filtros que venian en la url
-    function aplicarParametrosIniciales() {
-      inputBuscar.value = parametrosIniciales.get("buscar") || "";
-      var d = parametrosIniciales.get("dificultad");
-      if (d && [...selectDificultad.options].some(function (o) { return o.value === d; })) selectDificultad.value = d;
-      var t = parametrosIniciales.get("tema");
-      if (t && [...selectTema.options].some(function (o) { return o.value === t; })) selectTema.value = t;
-      var o = parametrosIniciales.get("orden");
-      if (o && [...selectOrden.options].some(function (op) { return op.value === o; })) selectOrden.value = o;
-    }
-
-    // leo el valor actual de cada filtro
-    function leerFiltros() {
-      return {
-        buscar: inputBuscar.value.trim(),
-        dificultad: selectDificultad.value,
-        tema: selectTema.value,
-        orden: selectOrden.value || "titulo"
-      };
-    }
-
-    // guardo los filtros en la url sin recargar la pagina
-    function actualizarUrl(filtros) {
-      var params = new URLSearchParams();
-      if (filtros.buscar) params.set("buscar", filtros.buscar);
-      if (filtros.dificultad) params.set("dificultad", filtros.dificultad);
-      if (filtros.tema) params.set("tema", filtros.tema);
-      if (filtros.orden && filtros.orden !== "titulo") params.set("orden", filtros.orden);
-      var q = params.toString();
-      window.history.replaceState(null, "", window.location.pathname + (q ? "?" + q : ""));
-    }
-
-    // texto que dice que filtros estan activos
-    function actualizarResumen(filtros) {
-      var partes = [];
-      if (filtros.buscar) partes.push('texto "' + filtros.buscar + '"');
-      if (filtros.dificultad) partes.push("dificultad " + filtros.dificultad);
-      if (filtros.tema) partes.push("tema " + filtros.tema);
-      if (filtros.orden !== "titulo") {
-        partes.push("orden: " + (selectOrden.selectedOptions[0]?.textContent || filtros.orden));
-      }
-      resumenFiltros.textContent = partes.length
-        ? "Filtros activos: " + partes.join(" · ")
-        : "Mostrando todas las guías.";
-    }
-
-    // dibujo las tarjetas de las guias que llegaron
-    function renderizarGuias(guias) {
-      contenedorGuias.replaceChildren();
+    try {
+      const datos = await pedir("/guias?" + params.toString());
+      document.getElementById("contadorGuias").textContent = datos.total + " guías";
 
       // si no hay resultados muestro un mensaje
-      if (guias.length === 0) {
-        var col = document.createElement("div");
-        col.className = "col-12";
-        var vacio = document.createElement("div");
-        vacio.className = "empty-state";
-
-        var ic = document.createElement("div");
-        ic.className = "empty-icon";
-        ic.setAttribute("aria-hidden", "true");
-        ic.append(crearIconoMinecraft("book"));
-
-        var t = document.createElement("h2");
-        t.className = "h5 mt-3";
-        t.textContent = "No encontramos guías con esos filtros";
-
-        var p = document.createElement("p");
-        p.className = "text-secondary mb-0";
-        p.textContent = "Prueba con otra dificultad o tema, o limpia los filtros.";
-
-        var b = document.createElement("button");
-        b.type = "button";
-        b.className = "btn btn-cp mt-3";
-        b.textContent = "Limpiar filtros";
-        b.addEventListener("click", limpiarFiltrosGuias);
-
-        vacio.append(ic, t, p, b);
-        col.append(vacio);
-        contenedorGuias.append(col);
+      if (datos.guias.length === 0) {
+        listaGuias.innerHTML = `<p class="text-secondary text-center py-5">No se encontraron guías con esos filtros.</p>`;
         return;
       }
 
-      var frag = document.createDocumentFragment();
-      guias.forEach(function (guia) {
-        frag.append(crearTarjetaGuia(guia, abrirDetalle));
-      });
-      contenedorGuias.append(frag);
-    }
-
-    // aqui se hace la busqueda de guias
-    async function cargarGuias() {
-      var filtros = leerFiltros();
-      // le doy un numero a esta peticion
-      var num = ++peticionActual;
-
-      actualizarUrl(filtros);
-      actualizarResumen(filtros);
-      contenedorGuias.setAttribute("aria-busy", "true");
-      contadorGuias.textContent = "Cargando…";
-      mostrarEsqueletos(contenedorGuias, 4, "240px", "col-lg-6");
-      limpiarAlerta(alertaGuias);
-
-      // armo la url, ej: /api/guias?buscar=redstone
-      var params = new URLSearchParams();
-      if (filtros.buscar) params.set("buscar", filtros.buscar);
-      if (filtros.dificultad) params.set("dificultad", filtros.dificultad);
-      if (filtros.tema) params.set("tema", filtros.tema);
-      params.set("orden", filtros.orden);
-
-      try {
-        var datos = await solicitar("/guias?" + params.toString());
-        // si ya hay una busqueda mas nueva, ignoro esta
-        if (num !== peticionActual) return;
-        renderizarGuias(datos.guias);
-        contadorGuias.textContent = datos.total + " guía" + (datos.total === 1 ? "" : "s");
-      } catch (error) {
-        if (num !== peticionActual) return;
-        contenedorGuias.replaceChildren();
-        contadorGuias.textContent = "0 guías";
-        mostrarAlerta(alertaGuias, "danger", error.message);
-      } finally {
-        if (num === peticionActual) contenedorGuias.removeAttribute("aria-busy");
+      let html = "";
+      for (const guia of datos.guias) {
+        html += tarjetaGuia(guia, true);
       }
+      listaGuias.innerHTML = html;
+    } catch (error) {
+      listaGuias.innerHTML = "";
+      document.getElementById("contadorGuias").textContent = "0 guías";
+      mostrarAlerta(alertaGuias, "danger", error.message);
     }
+  }
 
-    // vuelvo los filtros a su valor inicial y recargo
-    function limpiarFiltrosGuias() {
-      formFiltros.reset();
-      selectOrden.value = "titulo";
-      cargarGuias();
-    }
-
-    // lleno el modal de guia
-    function llenarDetalle(guia) {
-      document.getElementById("detalleGuiaIcono").replaceChildren(crearIconoMinecraft(guia.icono));
+  // pido una guia por su id y la muestro en el modal
+  async function verGuia(id) {
+    try {
+      const guia = await pedir("/guias/" + id);
+      // relleno cada parte del modal con los datos de la guia
+      document.getElementById("detalleGuiaIcono").innerHTML = icono(guia.icono);
       document.getElementById("detalleGuiaTitulo").textContent = guia.titulo;
       document.getElementById("detalleGuiaResumen").textContent = guia.resumen;
       document.getElementById("detalleGuiaTema").textContent = guia.tema;
+      document.getElementById("detalleGuiaMeta").innerHTML = `<i class="bi bi-clock"></i> ${escapar(guia.duracion)} · Versión ${escapar(guia.version)}`;
+      document.getElementById("detalleGuiaDificultad").className = "dificultad " + claseDificultad(guia.dificultad);
+      document.getElementById("detalleGuiaDificultad").textContent = guia.dificultad;
 
-      var metaEl = document.getElementById("detalleGuiaMeta");
-      metaEl.replaceChildren();
-      var reloj = document.createElement("i");
-      reloj.className = "bi bi-clock";
-      reloj.setAttribute("aria-hidden", "true");
-      var textoM = document.createElement("span");
-      textoM.textContent = guia.duracion + " · Versión " + guia.version;
-      metaEl.append(reloj, textoM);
-
-      var dif = document.getElementById("detalleGuiaDificultad");
-      dif.className = "dificultad " + claseDificultad(guia.dificultad);
-      dif.textContent = guia.dificultad;
-
-      // muestro el contenido separado por parrafos
-      var cont = document.getElementById("detalleGuiaContenido");
-      cont.replaceChildren();
-      guia.contenido.split("\n").map(function (l) { return l.trim(); }).filter(Boolean).forEach(function (linea) {
-        var par = document.createElement("p");
-        par.className = "mb-2";
-        par.textContent = linea;
-        cont.append(par);
-      });
-    }
-
-    // pido la guia completa por su id y abro el modal de bootstrap
-    async function abrirDetalle(guiaRes) {
-      try {
-        var guia = await solicitar("/guias/" + guiaRes.guia_id);
-        llenarDetalle(guia);
-        modalDetalle.show();
-      } catch (error) {
-        mostrarAlerta(alertaGuias, "danger", error.message);
+      // cada linea del contenido es un parrafo
+      let html = "";
+      for (const linea of guia.contenido.split("\n")) {
+        if (linea.trim() !== "") html += `<p class="mb-2">${escapar(linea.trim())}</p>`;
       }
+      document.getElementById("detalleGuiaContenido").innerHTML = html;
+      modalDetalle.show();
+    } catch (error) {
+      mostrarAlerta(alertaGuias, "danger", error.message);
     }
+  }
 
-    // eventos
-    formFiltros.addEventListener("submit", function (e) { e.preventDefault(); cargarGuias(); });
-    // busca cuando dejas de escribir por 350 ms
-    inputBuscar.addEventListener("input", function () {
-      clearTimeout(temporizadorBusqueda);
-      temporizadorBusqueda = setTimeout(cargarGuias, 350);
-    });
-    // los selects filtran apenas cambian
-    selectDificultad.addEventListener("change", cargarGuias);
-    selectTema.addEventListener("change", cargarGuias);
-    selectOrden.addEventListener("change", cargarGuias);
-    btnLimpiar.addEventListener("click", limpiarFiltrosGuias);
+  // busca cuando dejas de escribir por 350 ms
+  inputBuscar.addEventListener("input", () => {
+    clearTimeout(temporizador);
+    temporizador = setTimeout(cargarGuias, 350);
+  });
 
-    // inicio: lleno los selects, aplico los filtros de la url y cargo las guias
-    (async function () {
-      mostrarEsqueletos(contenedorGuias, 4, "240px", "col-lg-6");
-      try { await cargarMeta(); } catch (e) { mostrarAlerta(alertaGuias, "danger", e.message); }
-      aplicarParametrosIniciales();
-      await cargarGuias();
-    })();
-  })();
+  // los selects filtran apenas cambian
+  selectDificultad.addEventListener("change", cargarGuias);
+  selectTema.addEventListener("change", cargarGuias);
+  selectOrden.addEventListener("change", cargarGuias);
+
+  // enter en el buscador: busco sin recargar
+  document.getElementById("formFiltrosGuias").addEventListener("submit", (e) => {
+    e.preventDefault();
+    cargarGuias();
+  });
+
+  // boton limpiar
+  document.getElementById("btnLimpiarGuias").addEventListener("click", () => {
+    document.getElementById("formFiltrosGuias").reset();
+    cargarGuias();
+  });
+
+  // clic en "leer guía" (los botones se crean despues, por eso escucho en la lista)
+  listaGuias.addEventListener("click", (e) => {
+    const boton = e.target.closest(".btn-ver");
+    if (boton) verGuia(boton.dataset.id);
+  });
+
+  // al abrir la pagina lleno los selects y cargo las guias
+  pedir("/meta")
+    .then((meta) => {
+      llenarSelect(selectDificultad, meta.dificultades.map((d) => ({ valor: d, texto: d })), "Todas las dificultades");
+      llenarSelect(selectTema, meta.temas.map((t) => ({ valor: t, texto: t })), "Todos los temas");
+      cargarGuias();
+    })
+    .catch((error) => mostrarAlerta(alertaGuias, "danger", error.message));
 }

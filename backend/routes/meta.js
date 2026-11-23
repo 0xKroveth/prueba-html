@@ -1,45 +1,37 @@
-// ruta de metadatos para llenar los selects de filtros
+// datos para llenar los selects de los filtros
 
-const { Router } = require("express");
-const { consultar } = require("../db");
-const { asyncHandler } = require("../utils/http");
-const { RAREZAS, DIFICULTADES } = require("../constantes");
+const express = require("express");
+const pool = require("../db");
 
-const router = Router();
+const router = express.Router();
 
-// GET /api/meta - categorias, versiones, temas, rarezas y dificultades
-router.get(
-  "/",
-  asyncHandler(async (_req, res) => {
-    // hago las 3 consultas en paralelo para que sea mas rapido
-    const [categorias, versiones, temas] = await Promise.all([
-      consultar(
-        `SELECT
-           c.categoria_id,
-           c.nombre,
-           c.descripcion,
-           c.icono,
-           c.slug,
-           COUNT(i.item_id)::int AS total_items
-         FROM categorias AS c
-         -- left join para que salgan tambien las categorias sin items
-         LEFT JOIN items AS i ON i.categoria_id = c.categoria_id
-         GROUP BY c.categoria_id
-         ORDER BY c.categoria_id ASC`
-      ),
-      consultar("SELECT DISTINCT version FROM items ORDER BY version DESC"),
-      consultar("SELECT DISTINCT tema FROM guias ORDER BY tema ASC")
-    ]);
+// GET /api/meta
+router.get("/", async (req, res) => {
+  try {
+    // categorias con cuantos items tiene cada una
+    const categorias = await pool.query(
+      `SELECT c.*, COUNT(i.item_id)::int AS total_items
+       FROM categorias c
+       LEFT JOIN items i ON i.categoria_id = c.categoria_id
+       GROUP BY c.categoria_id
+       ORDER BY c.categoria_id`
+    );
+    // versiones y temas sin repetir para los filtros
+    const versiones = await pool.query("SELECT DISTINCT version FROM items ORDER BY version DESC");
+    const temas = await pool.query("SELECT DISTINCT tema FROM guias ORDER BY tema");
 
-    // las rarezas y dificultades son fijas, vienen de constantes.js
     res.json({
-      categorias,
-      versiones: versiones.map((fila) => fila.version),
-      temas: temas.map((fila) => fila.tema),
-      rarezas: RAREZAS,
-      dificultades: DIFICULTADES
+      categorias: categorias.rows,
+      versiones: versiones.rows.map((fila) => fila.version),
+      temas: temas.rows.map((fila) => fila.tema),
+      // estas son fijas, no cambian
+      rarezas: ["Común", "Poco común", "Raro", "Épico", "Legendario"],
+      dificultades: ["Principiante", "Intermedio", "Avanzado"]
     });
-  })
-);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ mensaje: "Error al cargar los filtros." });
+  }
+});
 
 module.exports = router;

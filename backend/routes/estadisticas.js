@@ -1,28 +1,27 @@
-// ruta de estadisticas para la pagina de inicio
+// numeros que se muestran en el inicio
 
-const { Router } = require("express");
-const { consultar } = require("../db");
-const { asyncHandler } = require("../utils/http");
+const express = require("express");
+const pool = require("../db");
 
-const router = Router();
+const router = express.Router();
 
-// GET /api/estadisticas - totales para los contadores del inicio
-router.get(
-  "/",
-  asyncHandler(async (_req, res) => {
-    // subconsultas para sacar todos los totales en una sola consulta
-    const filas = await consultar(
+// GET /api/estadisticas
+router.get("/", async (req, res) => {
+  try {
+    // cuento todo en una sola consulta
+    const resultado = await pool.query(
       `SELECT
          (SELECT COUNT(*)::int FROM items) AS total_items,
          (SELECT COUNT(*)::int FROM guias) AS total_guias,
          (SELECT COUNT(*)::int FROM categorias) AS total_categorias,
-         (SELECT COUNT(DISTINCT version)::int FROM items) AS total_versiones,
-         (SELECT COUNT(*)::int FROM items WHERE destacado) AS items_destacados,
-         (SELECT COUNT(DISTINCT tema)::int FROM guias) AS total_temas`
+         (SELECT COUNT(DISTINCT version)::int FROM items) AS total_versiones`
     );
 
-    res.json(filas[0]);
-  })
-);
+    res.json(resultado.rows[0]);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ mensaje: "Error al cargar las estadísticas." });
+  }
+});
 
 module.exports = router;

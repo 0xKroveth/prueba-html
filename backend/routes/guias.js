@@ -1,100 +1,63 @@
-// rutas de guias (leer y filtrar)
+// rutas de guias: listar, buscar y ver una
 
-const { Router } = require("express");
-const { consultar } = require("../db");
-const { asyncHandler, ErrorHttp } = require("../utils/http");
-const { texto, entero, opcion } = require("../utils/validacion");
-const { DIFICULTADES, ORDENES_GUIAS } = require("../constantes");
+const express = require("express");
+const pool = require("../db");
 
-const router = Router();
+const router = express.Router();
 
-// campos que necesito de la guia
-const CAMPOS_GUIA = `
-  g.guia_id,
-  g.titulo,
-  g.resumen,
-  g.contenido,
-  g.tema,
-  g.dificultad,
-  g.version,
-  g.duracion,
-  g.icono,
-  g.destacada,
-  g.creado_en
-`;
-
-// GET /api/guias/temas - temas para el filtro
-router.get(
-  "/temas",
-  asyncHandler(async (_req, res) => {
-    const filas = await consultar("SELECT DISTINCT tema FROM guias ORDER BY tema ASC");
-    res.json(filas.map((fila) => fila.tema));
-  })
-);
-
-// GET /api/guias - lectura con filtros
-router.get(
-  "/",
-  asyncHandler(async (req, res) => {
-    // leo y valido los filtros de la url
-    const buscar = req.query.buscar
-      ? texto(req.query.buscar, "buscar", { min: 1, max: 80 })
-      : null;
-    const dificultad = req.query.dificultad
-      ? opcion(req.query.dificultad, "dificultad", DIFICULTADES)
-      : null;
-    const tema = req.query.tema
-      ? texto(req.query.tema, "tema", { min: 1, max: 40 })
-      : null;
-    const version = req.query.version
-      ? texto(req.query.version, "version", { min: 1, max: 20 })
-      : null;
-    // si el filtro no viene queda en null y la consulta lo ignora
+// GET /api/guias - lista con filtros
+router.get("/", async (req, res) => {
+  try {
+    const buscar = req.query.buscar || null;
+    const dificultad = req.query.dificultad || null;
+    const tema = req.query.tema || null;
+    // destacadas solo se usa en el inicio
     const destacadas = req.query.destacadas === "true" ? true : null;
-    // el orden solo puede ser uno de constantes.js
-    const orden = Object.hasOwn(ORDENES_GUIAS, req.query.orden)
-      ? req.query.orden
-      : "titulo";
 
-    // igual que en items: busca en titulo, resumen y contenido
-    const guias = await consultar(
-      `SELECT ${CAMPOS_GUIA}
-       FROM guias AS g
-       WHERE (
-           $1::text IS NULL
-           OR g.titulo ILIKE '%' || $1 || '%'
-           OR g.resumen ILIKE '%' || $1 || '%'
-           OR g.contenido ILIKE '%' || $1 || '%'
-         )
-         AND ($2::text IS NULL OR g.dificultad = $2)
-         AND ($3::text IS NULL OR g.tema = $3)
-         AND ($4::text IS NULL OR g.version = $4)
-         AND ($5::boolean IS NULL OR g.destacada = $5)
-       ORDER BY ${ORDENES_GUIAS[orden]}, g.guia_id ASC`,
-      [buscar, dificultad, tema, version, destacadas]
-    );
-
-    res.json({ total: guias.length, guias });
-  })
-);
-
-// GET /api/guias/:id - una guia por su id
-router.get(
-  "/:id",
-  asyncHandler(async (req, res) => {
-    // el id tiene que ser un entero positivo, si no responde 400
-    const guiaId = entero(req.params.id, "id", { min: 1 });
-    const filas = await consultar(
-      `SELECT ${CAMPOS_GUIA} FROM guias AS g WHERE g.guia_id = $1`,
-      [guiaId]
-    );
-
-    if (filas.length === 0) {
-      throw new ErrorHttp(404, "La guía solicitada no existe.");
+    // el orden lo elijo yo, nunca pego texto del usuario en el sql
+    let orden = "titulo ASC";
+    if (req.query.orden === "recientes") {
+      orden = "creado_en DESC";
+    } else if (req.query.orden === "dificultad") {
+      orden = `CASE dificultad WHEN 'Principiante' THEN 1 WHEN 'Intermedio' THEN 2 ELSE 3 END, titulo ASC`;
     }
 
-    res.json(filas[0]);
-  })
-);
+    // igual que en items: busca en titulo, resumen y contenido
+    const resultado = await pool.query(
+      `SELECT * FROM guias
+       WHERE ($1::text IS NULL
+              OR titulo ILIKE '%' || $1 || '%'
+              OR resumen ILIKE '%' || $1 || '%'
+              OR contenido ILIKE '%' || $1 || '%')
+         AND ($2::text IS NULL OR dificultad = $2)
+         AND ($3::text IS NULL OR tema = $3)
+         AND ($4::boolean IS NULL OR destacada = $4)
+       ORDER BY ${orden}`,
+      [buscar, dificultad, tema, destacadas]
+    );
+
+    res.json({ total: resultado.rows.length, guias: resultado.rows });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ mensaje: "Error al buscar las guías." });
+  }
+});
+
+// GET /api/guias/3 - una guia por su id
+router.get("/:id", async (req, res) => {
+  try {
+    const resultado = await pool.query("SELECT * FROM guias WHERE guia_id = $1", [req.params.id]);
+
+    // si no encontro nada respondo 404
+    if (resultado.rows.length === 0) {
+      return res.status(404).json({ mensaje: "La guía no existe." });
+    }
+
+    res.json(resultado.rows[0]);
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ mensaje: "El id no es válido." });
+  }
+});
 
 module.exports = router;
